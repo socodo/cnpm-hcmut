@@ -1,333 +1,242 @@
+# 📚 Tutor Support System - Group 4
 
-# 📚 TUTOR-SUPPORT-SYSTEM-GR4
-
-A **Tutor Support System** designed to streamline communication and management between tutors and students.  
-This project follows a **client–server architecture** with a **React + Vite frontend** and a **Node.js (Express) backend**.
+> A comprehensive tutor-student management and communication system built with modern technologies.
 
 ---
 
-## 🚀 Tech Stack
+## 📑 Table of Contents
 
-### Frontend (Client)
-- ⚛️ React + Vite
-- 🎨 MUI / styled-components for theming
-- 🗂 Redux Toolkit for state management
-- 🔗 Axios for API calls
+- [🎯 Project Overview](#-project-overview)
+- [🛠️ Technology Stack](#️-technology-stack)
+- [📂 Project Structure](#-project-structure)
+- [✅ Prerequisites](#-prerequisites)
+- [🚀 Quick Start](#-quick-start)
+- [⚙️ Development Commands](#️-development-commands)
+- [🌿 Git Workflow](#-git-workflow)
+  - [🔑 Main Branches](#-main-branches)
+  - [🛠️ Workflow Steps](#️-workflow-steps)
+  - [🔧 Handling Conflicts](#-handling-conflicts)
+- [📋 Contributing Guidelines](#-contributing-guidelines)
+- [🔮 Development Roadmap](#-development-roadmap)
+- [📞 Contact & Support](#-contact--support)
+- [📜 License](#-license)
+- [🙏 Acknowledgments](#-acknowledgments)
 
-### Backend (Server)
-- 🟢 Node.js + Express
-- 🔒 Middleware for authentication & error handling
-- 🗄 Models (supports ORM like Prisma / Sequelize)
-- 📡 RESTful APIs
+---
+
+## 🎯 Project Overview
+
+The Tutor Support System is a web application designed to:
+- 📝 Manage tutor and student information
+- 💬 Facilitate communication and collaboration
+- 📊 Track learning progress and performance
+- 🔐 Provide authentication and user authorization
+
+**Current Status:** Frontend completed, Backend in development.
+
+---
+
+## 🛠️ Technology Stack
+
+### Frontend
+- ⚛️ **React 19** - Modern UI library
+- ⚡ **Vite 7** - Fast build tool
+- 🎨 **MUI v7** - Material Design components
+- 🎭 **Emotion** - CSS-in-JS styling
+- 🧹 **ESLint 9** - Code quality assurance
+
+### Backend *(in development)*
+- 🟢 **Node.js + Express** - Server runtime
+- 🗄️ **Database** - MongoDB/PostgreSQL
+- 🔒 **Authentication** - JWT tokens
+- 📡 **REST API** - RESTful architecture
 
 ---
 
 ## 📂 Project Structure
 
 ```
-TUTOR-SUPPORT-SYSTEM-GR4/
-├─ client/                     # Frontend (React + Vite)
-│  ├─ public/                  # Static files
-│  └─ src/
-│     ├─ api/                  # Axios config, API clients
-│     ├─ assets/               # Images, icons, fonts
-│     ├─ components/           # Reusable UI components
-│     ├─ hooks/                # Custom React hooks
-│     ├─ pages/                # Page-level components (routes)
-│     ├─ redux/                # Redux slices, reducers
-│     ├─ services/             # Business logic (API calls, data processing)
-│     ├─ store/                # Redux store setup
-│     ├─ utils/                # Helpers (format, validation, etc.)
-│     ├─ App.jsx               # Root App
-│     ├─ main.jsx              # Entry point
-│     └─ theme.js              # Theme config
-│
-├─ server/                     # Backend (Express API)
-│  ├─ src/
-│  │  ├─ routes/               # API routes
-│  │  ├─ controllers/          # Request handlers
-│  │  ├─ middlewares/          # Middleware (auth, error handler)
-│  │  ├─ services/             # Business logic for API
-│  │  ├─ models/               # Database models
-│  │  └─ index.js              # Server entry
-│  └─ package.json
-│
-├─ README.md
-└─ package.json                # Root config
-```
-
----
-
-## ⚙️ Installation & Setup
-
-### 1️⃣ Clone the repository
-```bash
-git clone https://github.com/your-username/TUTOR-SUPPORT-SYSTEM-GR4.git
-cd TUTOR-SUPPORT-SYSTEM-GR4
-```
-
----
-Perfect 👍 I see you’ve extended the Git workflow section with a **conflict resolution guide** — that’s a great addition for team collaboration!  
-
-Here’s the updated and polished **README.md** with your new content integrated smoothly:  
-
-```markdown
-# 🎓 Tutor Support System - GR4
-
-A system designed to support tutors in managing classes, tasks, and student interactions.  
-This project follows a clear Git workflow to ensure stability, scalability, and collaboration. 🚀
-
----
-
-## ⚙️ Installation & Setup
-
-### 1️⃣ Clone the repository
-```bash
-git clone https://github.com/your-username/TUTOR-SUPPORT-SYSTEM-GR4.git
-cd TUTOR-SUPPORT-SYSTEM-GR4
-```
-
----
-
-## 🌿 Git Workflow (Simplified)
-
-```scss
-(main)    o---------o--------o-----------o
-             \              / 
-              \            /   (PR) → merge to main
-(feature)      o----o----o
-```
-
----
-
-### 🔑 Main Branches
-- **`main`** → Production branch, always stable.  
-- **`feature/*`** → Feature branches created from `main`.
-
----
-
-### 🛠️ Workflow Steps
-
-#### 1. Update `main` with the latest changes
-```bash
-git checkout main
-git pull origin main
-```
-
-#### 2. Create a new feature branch for your task
-```bash
-git checkout -b feature/ISSUE-xxx-task-name
-```
-
-#### 3. Commit & push code
-```bash
-git add .
-git commit -m "feat: implement login form (#123)"
-git push origin feature/ISSUE-xxx-task-name  
-```
-
-#### 4. Open a Pull Request (PR)
-- **Source**: `feature/*`  
-- **Target**: `main`  
-- Request a review before merging ✅  
-
----
-
-### 🔧 Handling Conflicts
-
-If you hit conflicts while updating your feature branch (after merging/rebasing with `main`), follow this flow to keep history clean:
-
-1) Ensure you’re on your feature branch:
-```bash
-git checkout feature/ISSUE-xxx-task-name
-```
-
-2) Resolve conflicts in the files:
-```bash
-git add .
-```
-
-3) Amend the previous commit (reuse the existing message):
-```bash
-git commit --amend --no-edit
-```
-
-4) Force push the updated commit to your branch (the PR will update automatically):
-```bash
-git push origin feature/ISSUE-xxx-task-name -f
-```
-
----
-
-## 📌 Guidelines
-
-- ❌ Do **not** commit directly to `main`.  
-- 🌱 Each feature = one `feature/*` branch.  
-- 🔍 All merges go through **Pull Requests** for review and CI checks.  
-- 📝 Follow [Conventional Commits](https://www.conventionalcommits.org/):
-  - `feat: ...` → new feature  
-  - `fix: ...` → bug fix  
-  - `docs: ...` → documentation updates  
-  - `chore: ...` → maintenance tasks  
-
----
-
-## 📖 Contribution
-
-1. Pick or create an issue 🎯  
-2. Follow the Git workflow 🌿  
-3. Open a PR and request review 👥  
-
-We welcome contributions from everyone! ✨  
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License**.  
-Feel free to use, modify, and distribute with attribution. 👐
-```
-
----
-
-Would you like me to also add a **section with common Git commands (quick reference cheatsheet)** at the end of the README? That could make it even more beginner-friendly for new contributors.
-
-## 📌 Guidelines
-
-- ❌ Do **not** commit directly to `main`.  
-- 🌱 Each feature = one `feature/*` branch.  
-- 🔍 All merges go through **Pull Requests** for review and CI checks.  
-- 📝 Follow [Conventional Commits](https://www.conventionalcommits.org/):
-  - `feat: ...` → new feature  
-  - `fix: ...` → bug fix  
-  - `docs: ...` → documentation updates  
-  - `chore: ...` → maintenance tasks  
-
----
-
-## 📖 Contribution
-
-1. Pick or create an issue 🎯  
-2. Follow the Git workflow 🌿  
-3. Open a PR and request review 👥  
-
-We welcome contributions from everyone! ✨  
-
----
-
-## 📜 License
-## 📚 Tutor Support System – GR4
-
-Hệ thống hỗ trợ gia sư – sinh viên. Hiện tại dự án đã có phần Frontend (React + Vite); thư mục backend đang để trống và sẽ được bổ sung sau.
-
----
-
-## 🚀 Công nghệ sử dụng
-
-- Frontend: React 19 + Vite 7
-- UI: MUI v7 (Material UI) với Emotion (`@emotion/react`, `@emotion/styled`)
-- Công cụ: ESLint 9
-
-Lưu ý: Trong `client/src` đã chuẩn bị sẵn các thư mục như `api/`, `redux/`, `services/`, `utils/` để dễ mở rộng (chưa cài đặt Redux Toolkit/axios trong `package.json`).
-
----
-
-## � Cấu trúc thư mục
-
-```
 Tutor-Support-System-GR4/
-├─ client/                   # Ứng dụng React + Vite
-│  ├─ public/                # Tài nguyên tĩnh
-│  └─ src/
-│     ├─ api/
-│     ├─ assets/
-│     ├─ components/
-│     ├─ hooks/
-│     ├─ pages/
-│     ├─ redux/
-│     ├─ services/
-│     ├─ utils/
-│     ├─ App.jsx
-│     ├─ main.jsx
-│     └─ theme.js
-│
-├─ sever/                    # (đang trống) – đề xuất đổi tên thành "server/"
-└─ README.md
+├── 📁 client/                   # React Frontend Application
+│   ├── 📁 public/               # Static assets
+│   ├── 📁 src/
+│   │   ├── 📁 api/              # API clients & config
+│   │   ├── 📁 assets/           # Images, icons
+│   │   ├── 📁 components/       # UI components
+│   │   ├── 📁 hooks/            # Custom React hooks
+│   │   ├── 📁 pages/            # Page components
+│   │   ├── 📁 redux/            # State management
+│   │   ├── 📁 services/         # Business logic
+│   │   ├── 📁 utils/            # Utilities
+│   │   ├── 📄 App.jsx           # Root component
+│   │   ├── 📄 main.jsx          # Entry point
+│   │   └── 📄 theme.js          # Theme config
+│   └── 📄 package.json
+├── 📁 sever/                    # Backend (empty)
+└── 📄 README.md
 ```
 
 ---
 
-## 🧰 Yêu cầu hệ thống
+## ✅ Prerequisites
 
-- Node.js 18+ (khuyến nghị LTS)
-- npm 9+ hoặc pnpm/yarn (ví dụ dưới dùng npm)
+- 🟢 **Node.js** v18+ ([Download](https://nodejs.org/))
+- 📦 **npm** v9+ (or yarn/pnpm)
+- 🔧 **Git** ([Download](https://git-scm.com/))
+- 💻 **VS Code** + ESLint extension *(recommended)*
 
 ---
 
-## ▶️ Chạy nhanh (Frontend)
+## 🚀 Quick Start
 
-1) Cài dependencies
+### 1️⃣ Clone repository
+
+```powershell
+git clone https://github.com/your-username/TUTOR-SUPPORT-SYSTEM-GR4.git
+cd TUTOR-SUPPORT-SYSTEM-GR4
+```
+
+### 2️⃣ Install & Run Frontend
 
 ```powershell
 cd client
 npm install
-```
-
-2) Chạy chế độ phát triển
-
-```powershell
 npm run dev
 ```
 
-Vite sẽ hiển thị địa chỉ truy cập (mặc định http://localhost:5173).
+
 
 ---
 
-## 🏗️ Build & Preview
+## ⚙️ Development Commands
 
-- Build sản phẩm:
+### Frontend Commands
 
 ```powershell
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
 npm run build
-```
 
-- Xem trước bản build:
-
-```powershell
+# Preview production build
 npm run preview
-```
 
----
-
-## 🧹 Kiểm tra mã nguồn (Lint)
-
-```powershell
+# Check code style
 npm run lint
 ```
 
 ---
 
-## � Ghi chú về Backend
+## 🌿 Git Workflow
 
-- Thư mục hiện tại là `sever/` và đang trống. Nên đổi tên thành `server/` và thêm mã nguồn backend (ví dụ: Node.js + Express) khi bắt đầu phát triển API.
-- Khi bổ sung backend, cập nhật README với hướng dẫn chạy máy chủ API và các biến môi trường cần thiết.
+### 🔑 Main Branches
+- **`main`** → Production branch, always stable
+- **`feature/*`** → Feature branches from `main`
+
+### 🛠️ Workflow Steps
+
+#### 1. Update main branch
+```bash
+git checkout main
+git pull origin main
+```
+
+#### 2. Create new feature branch
+```bash
+git checkout -b feature/ISSUE-xxx-feature-name
+```
+
+#### 3. Commit and push code
+```bash
+git add .
+git commit -m "feat: add login form (#123)"
+git push origin feature/ISSUE-xxx-feature-name
+```
+
+#### 4. Create Pull Request
+- **Source:** `feature/*`
+- **Target:** `main`
+- **Requirement:** Review before merge ✅
 
 ---
 
-## 🤝 Đóng góp
+### 🔧 Handling Conflicts
 
-- Tạo nhánh tính năng từ `main` (ví dụ: `feature/ten-tinh-nang`) và mở Pull Request để review trước khi merge.
-- Khuyến khích dùng Conventional Commits: `feat: ...`, `fix: ...`, `docs: ...`, `chore: ...`.
+When conflicts occur during merge/rebase:
+
+1) **Ensure you're on the correct branch:**
+```bash
+git checkout feature/ISSUE-xxx-feature-name
+```
+
+2) **Resolve conflicts** (look for `<<<<<<<`, `=======`, `>>>>>>>`) and stage:
+```bash
+git add -A
+```
+
+3) **Amend commit and force push:**
+```bash
+git commit --amend --no-edit
+git push origin feature/ISSUE-xxx-feature-name -f
+```
 
 ---
 
-## 📜 Giấy phép
+## 📋 Contributing Guidelines
 
-Đề xuất dùng MIT. Nếu áp dụng, hãy thêm file `LICENSE` ở thư mục gốc.
+### 🚫 Don't:
+- Commit directly to `main`
+- Force push to `main`
+- Merge without PR review
+
+### ✅ Do:
+- Create issues before coding
+- Follow [Conventional Commits](https://www.conventionalcommits.org/):
+  - `feat:` - New features
+  - `fix:` - Bug fixes
+  - `docs:` - Documentation updates
+  - `style:` - Code formatting
+  - `refactor:` - Code refactoring
+  - `test:` - Add tests
+  - `chore:` - Maintenance tasks
+
+### 📝 Contribution Process:
+1. 🎯 Create or pick an issue
+2. 🌿 Follow Git workflow
+3. 👥 Create PR and request review
+4. ✅ Merge after approval
 
 ---
 
-© 2025 – Nhóm 4
+## 🔮 Development Roadmap
 
+### Phase 1: ✅ Frontend Foundation
+- [x] Setup React + Vite
+- [x] MUI integration
+- [x] Project structure
+- [x] Development workflow
 
+### Phase 2: 🚧 Backend Development
+- [ ] Setup Express server
+- [ ] Database design & models
+- [ ] Authentication system
+- [ ] REST API endpoints
+
+### Phase 3: 🔄 Integration
+- [ ] Frontend-Backend connection
+- [ ] State management (Redux)
+- [ ] Error handling
+- [ ] Testing
+
+### Phase 4: 🚀 Deployment
+- [ ] Production build
+- [ ] CI/CD pipeline
+- [ ] Monitoring & logging
+- [ ] Performance optimization
+
+---
 
