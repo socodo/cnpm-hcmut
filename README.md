@@ -6,3 +6,39 @@
 ---
 
 FE REACT && TAILWINDCSS
+
+---------------------------
+┌─────────────────────────────────────────────────────────┐
+│  GIAI ĐOẠN 1: ĐẦU KỲ (Tháng 7)                        │
+└─────────────────────────────────────────────────────────┘
+1. Admin tạo SEMESTER mới (status: UPCOMING)
+2. Sinh viên điền form khảo sát
+   → Tạo MENTORING_REQUESTS
+
+┌─────────────────────────────────────────────────────────┐
+│  GIAI ĐOẠN 2: CHUẨN BỊ (Tháng 8)                       │
+└─────────────────────────────────────────────────────────┘
+3. Admin xem MENTORING_REQUESTS
+   → Quyết định mở môn nào
+   → Tạo SUBJECTS và gán tutorIds
+4. Cập nhật SEMESTER status: OPEN_REGISTRATION
+5. Sinh viên đăng ký môn
+   → Tạo REGISTRATIONS
+6. Admin duyệt đăng ký
+
+┌─────────────────────────────────────────────────────────┐
+│  GIAI ĐOẠN 3: BẮT ĐẦU HỌC (Tháng 9)                    │
+└─────────────────────────────────────────────────────────┘
+7. Cập nhật SEMESTER status: IN_PROGRESS
+8. Giảng viên tạo lịch rảnh
+   → Tạo SLOTS (với date cụ thể)
+9. Sinh viên xem môn → chọn giảng viên → xem lịch → book
+   → Tạo BOOKINGS
+10. Hệ thống gửi NOTIFICATIONS
+
+┌─────────────────────────────────────────────────────────┐
+│  GIAI ĐOẠN 4: DIỄN RA (Cả kỳ)                          │
+└─────────────────────────────────────────────────────────┘
+11. Check-in khi đến buổi mentor
+12. Hoàn thành và để lại feedback
+13. Giảng viên tiếp tục tạo SLOTS mới
