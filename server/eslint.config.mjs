@@ -29,18 +29,18 @@ export default [
       // TypeScript specific rules
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-unused-vars': ['warn', { 
+      '@typescript-eslint/no-unused-vars': ['warn', {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_'
       }],
 
       // Code quality rules
-      'no-console': 'warn',
+      'no-console': 'off', // Allow console.log in server
       'no-lonely-if': 'warn',
       'no-trailing-spaces': 'warn',
       'no-multi-spaces': 'warn',
       'no-multiple-empty-lines': ['warn', { max: 1, maxEOF: 0 }],
-      
+
       // Formatting rules
       'space-before-blocks': ['error', 'always'],
       'object-curly-spacing': ['warn', 'always'],

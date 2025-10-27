@@ -1,21 +1,25 @@
 import express from 'express'
 import 'dotenv/config'
+import userRouter from '@/router/user.router'
+import { connectDB } from '@/config/db'
 
 const app = express()
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8080
 
-//config router
+// Middleware
+app.use(express.json())
 
+//Connect Database
+connectDB()
+// Routes
+app.use('/api', userRouter)
 
-//config  static file
+// Static files
 app.use(express.static('public'))
 
-app.get('/', (_req, res) => {
-  res.send('hello work')
-})
-
+// Root route
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${process.env.PORT}`)
+  console.log(`Server is running on http://localhost:${PORT}`)
 })
 
 export default app
