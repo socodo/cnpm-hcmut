@@ -5,11 +5,15 @@ export const programSchema = z.object({
   problem: z
     .string()
     .trim()
-    .min(20, "Vui lòng mô tả vấn đề cụ thể bạn cần mentor.")
+    .min(1, "Vui lòng mô tả vấn đề cụ thể bạn cần mentor.")
     .max(500, "Tối đa 500 ký tự."),
   format: z.string().min(1, "Vui lòng chọn hình thức mong muốn."),
   mentoringType: z.string().min(1, "Vui lòng chọn kiểu mentoring."),
-  reason: z.string().trim().min(10, "Vui lòng cho biết lý do cần mentoring."),
+  reason: z
+    .string()
+    .trim()
+    .min(1, "Vui lòng cho biết lý do cần mentoring.")
+    .max(500, "Tối đa 500 ký tự."),
   personalGoal: z.string().trim().max(300).optional().or(z.literal("")),
   adminNote: z.string().trim().max(500).optional().or(z.literal("")),
 });

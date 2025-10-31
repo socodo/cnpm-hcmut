@@ -178,9 +178,15 @@ export default function ProgramForm() {
             errors.reason ? styles.inputInvalid : ""
           }`}
           value={data.reason}
-          onChange={handleChange}
+          onChange={(e) => {
+            if (e.target.value.length <= maxChars) handleChange(e);
+          }}
+          maxLength={maxChars}
           required
         />
+        <div className={styles.counter}>
+          {data.reason.length}/{maxChars} ký tự
+        </div>
         {errors.reason && (
           <div className={styles.fieldError}>{errors.reason}</div>
         )}
