@@ -1,9 +1,10 @@
-import { Route, Routes } from 'react-router-dom'
-import HomePage from '../../features/home/HomePage'
-import MainLayout from '../../components/layout/MainLayout'
-import LoginPage from '@/features/login/LoginPage'
-import ProfilePage from '@/features/profile/pages/ProfilePage'
-import ProtectedRoute from './ProtectedRouter'
+import { Route, Routes } from "react-router-dom";
+import HomePage from "../../features/home/HomePage";
+import MainLayout from "../../components/layout/MainLayout";
+import LoginPage from "@/features/login/LoginPage";
+import ProfilePage from "@/features/profile/pages/ProfilePage";
+import ProtectedRoute from "./ProtectedRouter";
+import ProgramPage from "@/features/program/ProgramPage";
 
 const AppRouter = () => {
   return (
@@ -18,11 +19,12 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="programs" element={<ProgramPage />} />
       </Route>
 
-      <Route path='/login' element={<LoginPage />} />
+      <Route path="/login" element={<LoginPage />} />
     </Routes>
-  )
-}
+  );
+};
 
-export default AppRouter
+export default AppRouter;
