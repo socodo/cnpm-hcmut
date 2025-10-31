@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logo from '../../assets/img/bk_logo.png'
 import { useAuthStore } from '@/store/useAuthStore'
@@ -13,6 +13,12 @@ const LoginPage = () => {
     password: ''
   })
   const [warnBeforeLogin, setWarnBeforeLogin] = useState(false)
+  const [loginError, setLoginError] = useState(null) // State riêng cho error
+
+  // Reset error khi vào trang
+  useEffect(() => {
+    setLoginError(null)
+  }, [])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -24,6 +30,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoginError(null) // Reset error trước khi submit
 
     try {
       await signin({
@@ -35,6 +42,7 @@ const LoginPage = () => {
       navigate('/')
     } catch (err) {
       console.error('Login failed:', err)
+      setLoginError(err.message || 'Login failed. Please try again.')
     }
   }
 
@@ -60,10 +68,10 @@ const LoginPage = () => {
           <div className='w-80 bg-gray-50 p-4 rounded'>
             <h2 className='text-sm font-bold text-[#8B0033] mb-3'>Enter your Username and Password</h2>
 
-            {/* Error Message */}
-            {error && (
+            {/* Error Message - chỉ hiển thị khi có loginError */}
+            {loginError && (
               <div className='mb-3 p-2 bg-red-50 border border-red-300 rounded'>
-                <p className='text-xs text-red-600'>{error}</p>
+                <p className='text-xs text-red-600'>{loginError}</p>
               </div>
             )}
 

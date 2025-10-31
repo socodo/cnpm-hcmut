@@ -53,12 +53,13 @@ export const useAuthStore = create((set, get) => ({
     set({ accessToken: token })
   },
   logout: async () => {
-    const response = await authService.logout()
-    localStorage.setItem('isAuthenticated', 'false')
     set({
       accessToken: null,
       user: null,
       isAuthenticated: false
     })
+    const response = await authService.logout()
+    localStorage.setItem('isAuthenticated', 'false')
+
   }
 }))

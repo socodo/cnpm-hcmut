@@ -6,21 +6,20 @@ import { useAuthStore } from '@/store/useAuthStore';
 const ProfilePage = () => {
   const { user, fetchMe, loading: authLoading } = useAuthStore();
   const [loading, setLoading] = useState(true);
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+      if (!user) {
+        await fetchMe();
+      }
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        setLoading(true);
-        if (!user) {
-          await fetchMe();
-        }
-      } catch (error) {
-        console.error('Failed to load profile:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadProfile();
   }, []);
 

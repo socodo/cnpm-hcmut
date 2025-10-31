@@ -1,56 +1,63 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
-const EditProfileModal = ({ isOpen, onClose, profile, setProfile, userType }) => {
+const EditProfileModal = ({ isOpen, onClose, profile, userType }) => {
   const [formData, setFormData] = useState({
-    fullName: profile?.fullName || '',
-    bio: profile?.bio || '',
-    phone: profile?.phone || '',
-    address: profile?.address || '',
+    displayName: '',
+    phone: '',
+    dateOfBirth: '',
+    sex: '',
+    avatarUrl: '',
     // Tutor specific
-    title: profile?.title || '',
-    subjects: profile?.subjects || [],
-    education: profile?.education || '',
-    experience: profile?.experience || '',
-    hourlyRate: profile?.hourlyRate || '',
+    title: '',
+    department: '',
+    bio: '',
     // Student specific
-    gradeLevel: profile?.gradeLevel || '',
-    school: profile?.school || '',
-    interestedSubjects: profile?.interestedSubjects || [],
-    learningGoals: profile?.learningGoals || '',
+    faculty: '',
+    class: '',
+    year: '',
+    gpa: '',
   });
   const [loading, setLoading] = useState(false);
+
+  // Load dữ liệu từ profile vào form khi modal mở
+  useEffect(() => {
+    if (isOpen && profile) {
+      setFormData({
+        displayName: profile?.displayName || '',
+        phone: profile?.phone || '',
+        dateOfBirth: profile?.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : '',
+        sex: profile?.sex || '',
+        avatarUrl: profile?.avatarUrl || '',
+        // Tutor
+        title: profile?.tutor?.title || '',
+        department: profile?.tutor?.department || '',
+        bio: profile?.tutor?.bio || '',
+        // Student
+        faculty: profile?.student?.faculty || '',
+        class: profile?.student?.class || '',
+        year: profile?.student?.year || '',
+        gpa: profile?.student?.gpa || '',
+      });
+    }
+  }, [isOpen, profile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubjectsChange = (e) => {
-    const subjects = e.target.value.split(',').map(s => s.trim()).filter(s => s);
-    setFormData(prev => ({ 
-      ...prev, 
-      [userType === 'tutor' ? 'subjects' : 'interestedSubjects']: subjects 
-    }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Giả lập API call
+    // TODO: Call API để update profile
     setTimeout(() => {
-      // Cập nhật profile với data mới
-      setProfile(prev => ({
-        ...prev,
-        ...formData
-      }));
-      
       setLoading(false);
       onClose();
-      
-      // Hiển thị thông báo thành công (có thể dùng toast library)
       alert('Cập nhật thông tin thành công!');
+      // Reload page để fetch lại data mới
+      window.location.reload();
     }, 1000);
   };
 
@@ -77,23 +84,27 @@ const EditProfileModal = ({ isOpen, onClose, profile, setProfile, userType }) =>
             </label>
             <input
               type="text"
-              name="fullName"
-              value={formData.fullName}
+              name="displayName"
+              value={formData.displayName}
               onChange={handleChange}
+              placeholder={profile?.displayName}
               required
-              className="input-field"
+              disabled
+              className="input-field bg-gray-100 cursor-not-allowed"
             />
+            <p className="text-xs text-gray-500 mt-1">Không thể chỉnh sửa</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Giới thiệu bản thân
+              Số điện thoại
             </label>
-            <textarea
-              name="bio"
-              value={formData.bio}
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
               onChange={handleChange}
-              rows={3}
+              placeholder={profile?.phone || 'VD: +84901234567'}
               className="input-field"
             />
           </div>
@@ -101,29 +112,51 @@ const EditProfileModal = ({ isOpen, onClose, profile, setProfile, userType }) =>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Số điện thoại
+                Ngày sinh
               </label>
               <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
+                type="date"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
                 onChange={handleChange}
-                className="input-field"
+                disabled
+                className="input-field bg-gray-100 cursor-not-allowed"
               />
+              <p className="text-xs text-gray-500 mt-1">Không thể chỉnh sửa</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Địa chỉ
+                Giới tính
               </label>
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
+              <select
+                name="sex"
+                value={formData.sex}
                 onChange={handleChange}
-                className="input-field"
-              />
+                disabled
+                className="input-field bg-gray-100 cursor-not-allowed"
+              >
+                <option value="">Chọn giới tính</option>
+                <option value="Male">Nam</option>
+                <option value="Female">Nữ</option>
+                <option value="Other">Khác</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">Không thể chỉnh sửa</p>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              URL Avatar
+            </label>
+            <input
+              type="url"
+              name="avatarUrl"
+              value={formData.avatarUrl}
+              onChange={handleChange}
+              placeholder={profile?.avatarUrl || 'https://avatar.iran.liara.run/public'}
+              className="input-field"
+            />
           </div>
 
           {/* Tutor Specific Fields */}
@@ -131,69 +164,42 @@ const EditProfileModal = ({ isOpen, onClose, profile, setProfile, userType }) =>
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Chức danh
+                  Học hàm học vị
                 </label>
                 <input
                   type="text"
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  placeholder="VD: Giáo viên Toán, Gia sư Tiếng Anh"
+                  placeholder={profile?.tutor?.title || 'VD: Tiến sĩ, Thạc sĩ'}
                   className="input-field"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Môn học (cách nhau bởi dấu phẩy)
+                  Khoa/Bộ môn
                 </label>
                 <input
                   type="text"
-                  value={formData.subjects.join(', ')}
-                  onChange={handleSubjectsChange}
-                  placeholder="VD: Toán, Lý, Hóa"
-                  className="input-field"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Trình độ học vấn
-                </label>
-                <input
-                  type="text"
-                  name="education"
-                  value={formData.education}
+                  name="department"
+                  value={formData.department}
                   onChange={handleChange}
-                  placeholder="VD: Thạc sĩ Toán học - ĐH Khoa học Tự nhiên"
+                  placeholder={profile?.tutor?.department || 'VD: Khoa Khoa học và Kỹ thuật Máy tính'}
                   className="input-field"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Kinh nghiệm
+                  Giới thiệu bản thân
                 </label>
                 <textarea
-                  name="experience"
-                  value={formData.experience}
+                  name="bio"
+                  value={formData.bio}
                   onChange={handleChange}
-                  rows={3}
-                  placeholder="Mô tả kinh nghiệm giảng dạy của bạn"
-                  className="input-field"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Học phí (VNĐ/giờ)
-                </label>
-                <input
-                  type="number"
-                  name="hourlyRate"
-                  value={formData.hourlyRate}
-                  onChange={handleChange}
-                  placeholder="200000"
+                  rows={4}
+                  placeholder={profile?.tutor?.bio || 'Mô tả kinh nghiệm, chuyên môn của bạn...'}
                   className="input-field"
                 />
               </div>
@@ -203,59 +209,65 @@ const EditProfileModal = ({ isOpen, onClose, profile, setProfile, userType }) =>
           {/* Student Specific Fields */}
           {userType === 'student' && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Lớp học
-                  </label>
-                  <input
-                    type="text"
-                    name="gradeLevel"
-                    value={formData.gradeLevel}
-                    onChange={handleChange}
-                    placeholder="VD: Lớp 10"
-                    className="input-field"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Trường
-                  </label>
-                  <input
-                    type="text"
-                    name="school"
-                    value={formData.school}
-                    onChange={handleChange}
-                    placeholder="VD: THPT Lê Hồng Phong"
-                    className="input-field"
-                  />
-                </div>
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Môn học quan tâm (cách nhau bởi dấu phẩy)
+                  Khoa
                 </label>
                 <input
                   type="text"
-                  value={formData.interestedSubjects.join(', ')}
-                  onChange={handleSubjectsChange}
-                  placeholder="VD: Toán, Vật Lý, Tiếng Anh"
+                  name="faculty"
+                  value={formData.faculty}
+                  onChange={handleChange}
+                  placeholder={profile?.student?.faculty || 'VD: Computer Science and Engineering'}
                   className="input-field"
                 />
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Lớp
+                  </label>
+                  <input
+                    type="text"
+                    name="class"
+                    value={formData.class}
+                    onChange={handleChange}
+                    placeholder={profile?.student?.class || 'VD: MT2022'}
+                    className="input-field"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Năm học
+                  </label>
+                  <input
+                    type="number"
+                    name="year"
+                    value={formData.year}
+                    onChange={handleChange}
+                    min="1"
+                    max="5"
+                    placeholder={profile?.student?.year?.toString() || 'VD: 3'}
+                    className="input-field"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mục tiêu học tập
+                  GPA
                 </label>
-                <textarea
-                  name="learningGoals"
-                  value={formData.learningGoals}
+                <input
+                  type="number"
+                  name="gpa"
+                  value={formData.gpa}
                   onChange={handleChange}
-                  rows={3}
-                  placeholder="Mô tả mục tiêu học tập của bạn"
+                  step="0.01"
+                  min="0"
+                  max="10"
+                  placeholder={profile?.student?.gpa?.toString() || 'VD: 8.5'}
                   className="input-field"
                 />
               </div>
