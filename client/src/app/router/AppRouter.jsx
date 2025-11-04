@@ -10,8 +10,8 @@ const AppRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
-  <Route index element={<HomePage />} />
-  <Route path="programs" element={<ProgramPage />} />
+        <Route index element={<HomePage />} />
+        <Route path="programs" element={<ProgramPage />} />
         <Route
           path="profile"
           element={
@@ -20,6 +20,7 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
+
       </Route>
 
       <Route path='/login' element={<LoginPage />} />
