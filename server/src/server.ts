@@ -5,7 +5,9 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import authRouter from '@/router/auth.router'
 import userRouter from '@/router/user.router'
-import { authenticate } from '@/middlewares/auth.middleware'
+import { authenticate, authorize } from '@/middlewares/auth.middleware'
+import { UserRole } from './models'
+import adminRouter from '@/router/admin.router'
 
 const app = express()
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8080
@@ -32,6 +34,10 @@ app.use('/api/auth', authRouter)
 
 // PROTECTED ROUTES - Authentication required
 app.use('/api/users', authenticate, userRouter)
+
+//Admin Only
+app.use('/api/admin', authenticate, authorize(UserRole.ADMIN), adminRouter)
+
 
 // Start server
 app.listen(PORT, () => {

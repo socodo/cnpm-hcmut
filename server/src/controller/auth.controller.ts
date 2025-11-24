@@ -6,7 +6,6 @@ import { User, UserRole } from '@/models/user.model'
 import { Session } from '@/models/session.model'
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'access-secret-key'
-const JWT_EXPIRES_IN = '2m' // 7 days
 const REFRESH_TOKEN_EXPIRES_DAYS = 7
 
 /**
@@ -73,8 +72,9 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
     }
 
     const accessToken = jwt.sign(tokenPayload, JWT_ACCESS_SECRET, {
-      expiresIn: JWT_EXPIRES_IN
+      expiresIn: 60 * 60
     })
+
 
     const refreshToken = crypto.randomBytes(64).toString('hex')
     const expiresAt = new Date()
@@ -182,7 +182,7 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
     }
 
     const accessToken = jwt.sign(tokenPayload, JWT_ACCESS_SECRET, {
-      expiresIn: JWT_EXPIRES_IN
+      expiresIn: 60 * 60
     })
 
     // 6. Check existing refresh token in cookie
@@ -302,7 +302,7 @@ export const refreshAccessToken = async (req: Request, res: Response): Promise<v
     }
 
     const newAccessToken = jwt.sign(tokenPayload, JWT_ACCESS_SECRET, {
-      expiresIn: JWT_EXPIRES_IN
+      expiresIn: '1h'
     })
 
 

@@ -5,20 +5,23 @@ import LoginPage from '@/features/login/LoginPage'
 import ProfilePage from '@/features/profile/pages/ProfilePage'
 import ProgramPage from '../../features/program/ProgramPage'
 import ProtectedRoute from './ProtectedRouter'
-import ExplorePage from '../../features/explore/ExplorePage.jsx';
+import AdminProtectedRoute from './AdminProtectedRoute'
+import ExplorePage from '../../features/explore/ExplorePage.jsx'
+import AdminDashboard from '../../features/admin/AdminDashboard'
+import AdminLayout from '../../features/admin/AdminLayout'
 const AppRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path="programs" element={<ProgramPage />} />
-        <Route 
-          path="explore" 
+        <Route
+          path="explore"
           element={
             <ProtectedRoute>
               <ExplorePage />
             </ProtectedRoute>
-          } 
+          }
         />
         <Route
           path="profile"
@@ -28,6 +31,18 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Admin Routes using MainLayout header/footer */}
+        <Route
+          path="admin"
+          element={
+            <AdminProtectedRoute>
+              <AdminLayout />
+            </AdminProtectedRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+        </Route>
 
       </Route>
 
