@@ -39,6 +39,7 @@ app.use('/api/users', authenticate, userRouter)
 app.use('/api/admin', authenticate, authorize(UserRole.ADMIN), adminRouter)
 
 
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
