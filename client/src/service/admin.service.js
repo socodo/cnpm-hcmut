@@ -21,7 +21,13 @@ export const adminService = {
 
   // Lấy tất cả kỳ học (nếu có API)
   getAllSemesters: async () => {
-    const response = await axios.get('/admin/get-all-semesters')
+    const response = await axios.get('/admin/get-all-semester')
+    return response
+  },
+
+  // Cập nhật trạng thái kỳ học
+  updateSemesterStatus: async (semesterId, status) => {
+    const response = await axios.patch(`/admin/update-semester-status/${semesterId}`, { status })
     return response
   }
 }

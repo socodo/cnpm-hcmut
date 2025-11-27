@@ -54,7 +54,7 @@ const SemesterSchema = new Schema<ISemester>(
     status: {
       type: String,
       enum: Object.values(SemesterStatus),
-      default: SemesterStatus.ACTIVE
+      default: SemesterStatus.COMPLETED
     },
     startDateSurvey: {
       type: Date,

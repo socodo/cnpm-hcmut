@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import SemestersTab from "./tabs/SemestersTab";
 import SurveyTab from "./tabs/SurveyTab";
 import UsersTab from "./tabs/UsersTab";
+import { adminService } from "../../service/admin.service";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("survey");
@@ -23,86 +26,86 @@ export default function AdminDashboard() {
     semesterNumber: 1,
     startDate: "",
     endDate: "",
+    startDateSurvey: "",
+    endDateSurvey: "",
   });
 
-  const [semesters, setSemesters] = useState([
-    {
-      id: 1,
-      code: "HK1 2024-2025",
-      status: "Đang mở",
-      startDate: "2024-09-01",
-      endDate: "2025-01-15",
-      subjects: 12,
-      students: 234,
-      statusColor: "text-red-600 bg-red-50",
-    },
-    {
-      id: 2,
-      code: "HK2 2023-2024",
-      status: "Đã đóng",
-      startDate: "2024-01-15",
-      endDate: "2024-06-30",
-      subjects: 15,
-      students: 198,
-      statusColor: "text-green-600 bg-green-50",
-    },
-    {
-      id: 3,
-      code: "HK1 2023-2024",
-      status: "Đã đóng",
-      startDate: "2023-09-01",
-      endDate: "2024-01-10",
-      subjects: 14,
-      students: 187,
-      statusColor: "text-green-600 bg-green-50",
-    },
-  ]);
+  const [semesters, setSemesters] = useState([]);
+
+  const fetchSemesters = async () => {
+    try {
+      const response = await adminService.getAllSemesters();
+
+      if (response.success) {
+        const formattedSemesters = response.data.map(s => ({
+          id: s._id,
+          name: s.name,
+          code: s.code,
+          status: s.status === 'ACTIVE' ? "Đang mở" : "Đã đóng",
+          startDate: s.startDate.split('T')[0],
+          endDate: s.endDate.split('T')[0],
+          subjects: 0, // Placeholder
+          students: 0, // Placeholder
+          statusColor: s.status === 'ACTIVE' ? "text-green-600 bg-green-50" : "text-gray-600 bg-gray-50",
+        }));
+        setSemesters(formattedSemesters);
+      }
+    } catch (error) {
+      console.error("Failed to fetch semesters", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSemesters();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newSemester = {
-      id: Date.now(),
-      code:
-        formData.code ||
-        `HK${formData.semesterNumber} ${formData.academicYear}`,
-      status: "Đã đóng",
-      startDate: formData.startDate || "",
-      endDate: formData.endDate || "",
-      subjects: 0,
-      students: 0,
-      statusColor: "text-green-600 bg-green-50",
-    };
-    setSemesters((prev) => [newSemester, ...prev]);
-    setFormData({
-      code: "",
-      name: "",
-      academicYear: "",
-      semesterNumber: 1,
-      startDate: "",
-      endDate: "",
-    });
-    setShowCreateForm(false);
+    try {
+      const response = await adminService.createSemester(formData);
+      // Kiểm tra response.success hoặc response.data.success tùy theo cách API trả về
+      if (response.success || response.data?.success) {
+        toast.success("Tạo kỳ đăng ký thành công!");
+        fetchSemesters();
+        setFormData({
+          code: "",
+          name: "",
+          academicYear: "",
+          semesterNumber: 1,
+          startDate: "",
+          endDate: "",
+          startDateSurvey: "",
+          endDateSurvey: "",
+        });
+        setShowCreateForm(false);
+      }
+    } catch (error) {
+      console.error("Failed to create semester", error);
+      toast.error(error.response?.data?.message || "Không thể tạo kỳ đăng ký");
+    }
   };
 
-  const toggleSemesterStatus = (id) => {
-    setSemesters((prev) =>
-      prev.map((s) => {
-        if (s.id !== id) return s;
-        const isOpen = s.status === "Đang mở";
-        return {
-          ...s,
-          status: isOpen ? "Đã đóng" : "Đang mở",
-          statusColor: isOpen
-            ? "text-green-600 bg-green-50"
-            : "text-red-600 bg-red-50",
-        };
-      })
-    );
+  const toggleSemesterStatus = async (id) => {
+    const semester = semesters.find(s => s.id === id);
+    if (!semester) return;
+
+    const newStatus = semester.status === "Đang mở" ? "COMPLETED" : "ACTIVE";
+
+    try {
+      const response = await adminService.updateSemesterStatus(id, newStatus);
+      if (response.data.success) {
+        toast.success("Cập nhật trạng thái thành công!");
+        fetchSemesters();
+      }
+    } catch (error) {
+      console.error("Failed to update semester status", error);
+      toast.error(error.response?.data?.message || "Không thể cập nhật trạng thái");
+    }
   };
 
   const headerMap = {
@@ -125,6 +128,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-6 space-y-6">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">{headerTitle}</h1>
