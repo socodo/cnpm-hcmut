@@ -11,6 +11,9 @@ import AdminDashboard from "../../features/admin/AdminDashboard";
 import AdminLayout from "../../features/admin/AdminLayout";
 import SemesterCoursesPage from "../../features/admin/SemesterCoursesPage";
 import CourseTeachersPage from "../../features/admin/CourseTeachersPage";
+import MySchedulePage from "../../features/tutor/pages/MySchedulePage";
+import ManageSchedulePage from "../../features/tutor/pages/ManageSchedulePage";
+
 const AppRouter = () => {
   return (
     <Routes>
@@ -30,6 +33,22 @@ const AppRouter = () => {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="my-schedule"
+          element={
+            <ProtectedRoute>
+              <MySchedulePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="manage-schedule"
+          element={
+            <ProtectedRoute>
+              <ManageSchedulePage />
             </ProtectedRoute>
           }
         />

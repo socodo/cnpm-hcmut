@@ -93,6 +93,26 @@ export const Header = () => {
                   Hồ sơ cá nhân
                 </NavLink>
 
+                {/* Tutor Links - Only show for TUTOR users */}
+                {user.roles?.includes("TUTOR") && (
+                  <>
+                    <NavLink
+                      to="/my-schedule"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      Xem lịch của tôi
+                    </NavLink>
+                    <NavLink
+                      to="/manage-schedule"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      Quản lý lịch rảnh
+                    </NavLink>
+                  </>
+                )}
+
                 {/* Admin Panel Link - Only show for ADMIN users */}
                 {user.roles?.includes("ADMIN") && (
                   <NavLink
