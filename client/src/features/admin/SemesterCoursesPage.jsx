@@ -5,54 +5,7 @@ export default function SemesterCoursesPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // simple mock data (in real app replace with API call)
-  const semesters = [
-    {
-      id: "1",
-      code: "HK1 2024-2025",
-      status: "Đang mở",
-      startDate: "2024-09-01",
-      endDate: "2025-01-15",
-    },
-    {
-      id: "2",
-      code: "HK2 2023-2024",
-      status: "Đã đóng",
-      startDate: "2024-01-15",
-      endDate: "2024-06-30",
-    },
-  ];
 
-  const coursesBySemester = {
-    1: [
-      {
-        id: "CO2003",
-        code: "CO2003",
-        name: "Cấu Trúc Dữ Liệu & Giải Thuật",
-        desc: "Học về các cấu trúc dữ liệu cơ bản và thuật toán",
-        tutors: 2,
-        students: 45,
-      },
-      {
-        id: "CO3001",
-        code: "CO3001",
-        name: "Cơ Sở Dữ Liệu",
-        desc: "Thiết kế và quản lý cơ sở dữ liệu",
-        tutors: 1,
-        students: 38,
-      },
-    ],
-    2: [
-      {
-        id: "CO1001",
-        code: "CO1001",
-        name: "Nhập Môn Tin Học",
-        desc: "Kiến thức cơ bản về tin học",
-        tutors: 1,
-        students: 120,
-      },
-    ],
-  };
 
   const sem = semesters.find((s) => s.id === id) || semesters[0];
   const [courses, setCourses] = useState(coursesBySemester[id] || []);

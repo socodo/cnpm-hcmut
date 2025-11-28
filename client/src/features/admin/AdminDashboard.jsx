@@ -98,13 +98,14 @@ export default function AdminDashboard() {
 
     try {
       const response = await adminService.updateSemesterStatus(id, newStatus);
-      if (response.data.success) {
-        toast.success("Cập nhật trạng thái thành công!");
+      if (response.success) {
+        const successMessage = response.message
+        toast.success(successMessage);
         fetchSemesters();
       }
     } catch (error) {
-      console.error("Failed to update semester status", error);
-      toast.error(error.response?.data?.message || "Không thể cập nhật trạng thái");
+      const errorMessage = error.message
+      toast.error(errorMessage);
     }
   };
 

@@ -174,7 +174,7 @@ export const updateSemesterStatus = async (req: AuthRequest, res: Response): Pro
       if (activeSemester) {
         res.status(400).json({
           success: false,
-          message: 'Cannot open this semester because another semester is currently active. Please close all other semesters first.'
+          message: 'Hiện Đang Có Kỳ Học Mở. Vui Lòng Đóng Kỳ Học Này Trước Khi Mở Kỳ Học Khác.'
         })
         return
       }
@@ -185,7 +185,7 @@ export const updateSemesterStatus = async (req: AuthRequest, res: Response): Pro
 
     res.status(200).json({
       success: true,
-      message: 'Semester status updated successfully',
+      message: 'Đã Mở Kỳ Thành Công',
       data: {
         semesterId: semester._id,
         status: semester.status
