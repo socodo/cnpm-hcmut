@@ -1,6 +1,5 @@
 import { Response } from 'express'
 import { AuthRequest } from '@/middlewares/auth.middleware'
-import { error } from 'console'
 import { Semester, User, Subject, SemesterStatus } from '@/models'
 
 export const getAllSubject = async (req: AuthRequest, res: Response): Promise<void> => {

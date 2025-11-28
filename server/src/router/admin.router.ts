@@ -5,7 +5,6 @@ import {
     createSubject,
     getAllSubject
 } from '@/controller/admin.controller'
-import { get } from 'axios'
 import express from 'express'
 
 const router = express.Router()
