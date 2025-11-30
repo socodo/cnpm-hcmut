@@ -499,3 +499,59 @@ export const removeTutorFromSubject = async (req: AuthRequest, res: Response): P
     })
   }
 }
+
+export const getTutorsBySubject = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const subjectId = req.params.id
+
+    const subject = await Subject.findById(subjectId)
+      .populate({
+        path: 'tutorIds',
+        select: 'displayName email avatarUrl roles tutor',
+      })
+
+    if (!subject) {
+      res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy môn học'
+      })
+      return
+    }
+
+    // Map dữ liệu tutors
+    const tutors = subject.tutorIds.map((tutor: any) => ({
+      _id: tutor._id,
+      displayName: tutor.displayName,
+      email: tutor.email,
+      avatarUrl: tutor.avatarUrl,
+      title: tutor.tutor?.title || 'Giảng viên',
+      department: tutor.tutor?.department || subject.department,
+      bio: tutor.tutor?.bio || ''
+    }))
+
+    res.status(200).json({
+      success: true,
+      message: 'Lấy danh sách giảng viên thành công',
+      data: {
+        subject: {
+          _id: subject._id,
+          code: subject.code,
+          name: subject.name,
+          department: subject.department
+        },
+        tutors: tutors,
+        total: tutors.length
+      }
+    })
+
+  } catch (error) {
+    console.error('GetTutorsBySubject error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Can not get tutors by subject'
+    })
+  }
+}
+
+

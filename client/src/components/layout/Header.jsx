@@ -1,11 +1,12 @@
 import Logo from "../common/Logo";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEffect, useState } from "react";
 
 export const Header = () => {
   const { user, fetchMe, isAuthenticated, logout } = useAuthStore();
   const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated && !user) {
@@ -66,9 +67,8 @@ export const Header = () => {
                 {user.fullName || user.email}
               </span>
               <svg
-                className={`w-4 h-4 transition-transform ${
-                  showDropdown ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transition-transform ${showDropdown ? "rotate-180" : ""
+                  }`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -151,7 +151,7 @@ export const Header = () => {
                   onClick={() => {
                     setShowDropdown(false);
                     logout();
-                    // TODO: Add logout logic
+                    navigate("/");
                   }}
                 >
                   Đăng xuất

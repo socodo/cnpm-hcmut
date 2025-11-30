@@ -8,6 +8,7 @@ import userRouter from '@/router/user.router'
 import { authenticate, authorize } from '@/middlewares/auth.middleware'
 import { UserRole } from './models'
 import adminRouter from '@/router/admin.router'
+import tutorRouter from '@/router/tutor.router'
 
 const app = express()
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8080
@@ -35,8 +36,10 @@ app.use('/api/auth', authRouter)
 // PROTECTED ROUTES - Authentication required
 app.use('/api/users', authenticate, userRouter)
 
-//Admin Only
-app.use('/api/admin', authenticate, authorize(UserRole.ADMIN), adminRouter)
+// Admin routes - authenticate required, authorize per route
+app.use('/api/admin', authenticate, adminRouter)
+
+app.use('/api/tutor', authenticate, authorize(UserRole.TUTOR), tutorRouter)
 
 
 

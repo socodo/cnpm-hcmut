@@ -21,7 +21,11 @@ const AppRouter = () => {
     <Routes>
       <Route path="/" element={<MainLayout />}>
         <Route index element={<HomePage />} />
-        <Route path="programs" element={<ProgramPage />} />
+        <Route path="programs" element={
+          <ProtectedRoute>
+            <ProgramPage />
+          </ProtectedRoute>
+        } />
         <Route
           path="explore"
           element={

@@ -57,5 +57,11 @@ export const adminService = {
   removeTutorFromSubject: async (subjectId, tutorId) => {
     const response = await axios.delete(`/admin/remove-tutor/${subjectId}`, { data: { tutorId } })
     return response
+  },
+
+  // Lấy danh sách giảng viên của môn học
+  getTutorsBySubject: async (subjectId) => {
+    const response = await axios.get(`/admin/get-tutors-by-subject/${subjectId}`)
+    return response
   }
 }

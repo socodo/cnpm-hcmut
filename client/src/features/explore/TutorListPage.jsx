@@ -13,7 +13,7 @@ import {
   AlertCircle,
   X,
 } from "lucide-react";
-import { getMockSubjects, getMockTutorsBySubject } from "./data/mockdata.js";
+import { adminService } from "../../service/admin.service";
 import TutorScheduleModal from "./components/TutorScheduleModal";
 
 const TutorListPage = () => {
@@ -21,6 +21,7 @@ const TutorListPage = () => {
   const navigate = useNavigate();
   const [subject, setSubject] = useState(null);
   const [tutors, setTutors] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedTutor, setSelectedTutor] = useState(null);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,16 +34,50 @@ const TutorListPage = () => {
 
   useEffect(() => {
     if (subjectId) {
-      const subjects = getMockSubjects();
-      const foundSubject = subjects.find((s) => s.id === parseInt(subjectId));
-
-      if (foundSubject) {
-        setSubject(foundSubject);
-        const tutorList = getMockTutorsBySubject(foundSubject.id);
-        setTutors(tutorList);
-      }
+      fetchData();
     }
   }, [subjectId]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      // Lấy thông tin môn học
+      const subjectRes = await adminService.getSubjectById(subjectId);
+      if (subjectRes.success) {
+        const subjectData = subjectRes.data;
+        setSubject({
+          id: subjectData._id,
+          code: subjectData.code,
+          name: subjectData.name,
+          description: subjectData.description || "Chưa có mô tả",
+          department: subjectData.department || "Khoa học Máy tính",
+          totalTutors: subjectData.tutorIds?.length || 0,
+        });
+      }
+
+      // Lấy danh sách giảng viên của môn học
+      const tutorsRes = await adminService.getTutorsBySubject(subjectId);
+      if (tutorsRes.success) {
+        const mappedTutors = tutorsRes.data.tutors.map((tutor) => ({
+          id: tutor._id,
+          name: tutor.displayName || "Chưa có tên",
+          email: tutor.email,
+          avatar: tutor.avatarUrl || "https://avatar.iran.liara.run/public",
+          education: tutor.title || "Giảng viên",
+          department: tutor.department,
+          bio: tutor.bio || "",
+          tags: ["Online", "Offline", "1-1"],
+          specialties: [tutorsRes.data.subject?.name || "Môn học"],
+        }));
+        setTutors(mappedTutors);
+      }
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleTutorClick = (tutor) => {
     setSelectedTutor(tutor);
@@ -127,7 +162,32 @@ const TutorListPage = () => {
     setShowAvailableOnly(false);
   };
 
-  if (!subject) return <div className="p-8 text-center">Đang tải...</div>;
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-gray-500">Đang tải dữ liệu...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!subject) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <button
+          onClick={() => navigate("/explore")}
+          className="flex items-center text-gray-600 hover:text-sky-600 mb-6 transition-colors"
+        >
+          <ArrowLeft size={20} className="mr-2" />
+          Quay lại
+        </button>
+        <div className="text-center py-12">
+          <p className="text-gray-500">Không tìm thấy môn học</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -190,11 +250,10 @@ const TutorListPage = () => {
             </div>
             <button
               onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-              className={`flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg transition-colors font-medium ${
-                isFilterExpanded
+              className={`flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg transition-colors font-medium ${isFilterExpanded
                   ? "bg-sky-50 text-sky-600 border-sky-200"
                   : "bg-white text-gray-700 hover:bg-gray-50"
-              }`}
+                }`}
             >
               <Filter size={20} />
               Lọc

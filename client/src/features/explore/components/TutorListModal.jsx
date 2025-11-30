@@ -149,9 +149,8 @@ const TutorListModal = ({ isOpen, onClose, subject }) => {
                       className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0`}
                       style={{
                         backgroundColor: tutor.avatar.includes("background=")
-                          ? `#${
-                              tutor.avatar.split("background=")[1].split("&")[0]
-                            }`
+                          ? `#${tutor.avatar.split("background=")[1].split("&")[0]
+                          }`
                           : "#0ea5e9",
                       }}
                     >

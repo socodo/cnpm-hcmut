@@ -1,20 +1,62 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
-import { getMockSubjects } from "./data/mockdata.js";
 import SubjectCard from "./components/SubjectCard";
+import { adminService } from "../../service/admin.service";
 
 const ExplorePage = () => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  const [subjects] = useState(getMockSubjects());
+  const [subjects, setSubjects] = useState([]);
+  const [semester, setSemester] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFaculty, setSelectedFaculty] = useState("Tất cả khoa");
   const [selectedFormat, setSelectedFormat] = useState("Tất cả");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      // Lấy tất cả kỳ học và tìm kỳ ACTIVE
+      const semestersRes = await adminService.getAllSemesters();
+      if (semestersRes.success) {
+        const activeSemester = semestersRes.data.find(s => s.status === 'ACTIVE');
+
+        if (activeSemester) {
+          setSemester(activeSemester);
+
+          // Lấy danh sách môn học của kỳ ACTIVE
+          const subjectsRes = await adminService.getAllSubject(activeSemester._id);
+          if (subjectsRes.success) {
+            // Map dữ liệu từ API sang format phù hợp với SubjectCard
+            const mappedSubjects = subjectsRes.data.subjects.map(subject => ({
+              id: subject._id,
+              code: subject.code,
+              name: subject.name,
+              description: subject.description || "Chưa có mô tả",
+              department: subject.department || "Khoa học Máy tính",
+              faculty: subject.faculty || "CNTT",
+              credits: subject.credits || 3,
+              totalTutors: subject.tutorIds?.length || 0,
+              image: `https://picsum.photos/seed/${subject.code}/400/300`,
+              format: "Kết hợp", // Default format
+            }));
+            setSubjects(mappedSubjects);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubjectClick = (subject) => {
     navigate(`/explore/${subject.id}`);
@@ -28,6 +70,16 @@ const ExplorePage = () => {
       (selectedFormat === "Tất cả" || subject.format === selectedFormat)
   );
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-gray-500">Đang tải dữ liệu...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
@@ -38,6 +90,12 @@ const ExplorePage = () => {
         <p className="text-gray-600">
           Tìm kiếm và lựa chọn môn học phù hợp với nhu cầu của bạn tại HCMUT
         </p>
+        {semester && (
+          <div className="mt-3 inline-flex items-center px-4 py-2 bg-sky-50 text-sky-700 rounded-lg border border-sky-200">
+            <span className="font-medium">Kỳ hiện tại:</span>
+            <span className="ml-2">{semester.name} - {semester.academicYear}</span>
+          </div>
+        )}
       </div>
 
       {/* Search and Filter Bar */}

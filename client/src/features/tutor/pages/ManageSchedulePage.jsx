@@ -27,6 +27,15 @@ const ScheduleModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   });
   const [errors, setErrors] = useState({});
 
+  // Hàm mapping ngày sang thứ
+  const getDayOfWeek = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const dayIndex = date.getDay(); // 0 = Chủ nhật, 1 = Thứ 2, ...
+    const days = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+    return days[dayIndex];
+  };
+
   React.useEffect(() => {
     if (initialData) {
       setFormData({
@@ -56,10 +65,21 @@ const ScheduleModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     setErrors({});
   }, [initialData, isOpen]);
 
+  // Cập nhật thứ khi chọn ngày
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    const dayOfWeek = getDayOfWeek(selectedDate);
+    setFormData({
+      ...formData,
+      date: selectedDate,
+      day: dayOfWeek
+    });
+    if (selectedDate) setErrors({ ...errors, date: null });
+  };
+
   const validate = () => {
     const newErrors = {};
-    if (!formData.day && !formData.date)
-      newErrors.day = "Vui lòng chọn thứ hoặc ngày cụ thể";
+    if (!formData.date) newErrors.date = "Vui lòng chọn ngày";
     if (!formData.startTime) newErrors.startTime = "Vui lòng chọn giờ bắt đầu";
     if (!formData.endTime) newErrors.endTime = "Vui lòng chọn giờ kết thúc";
 
@@ -102,49 +122,34 @@ const ScheduleModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         {/* Body */}
         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Day of week */}
+            {/* Date picker */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                Thứ trong tuần *
-              </label>
-              <select
-                value={formData.day}
-                onChange={(e) => {
-                  setFormData({ ...formData, day: e.target.value });
-                  if (e.target.value) setErrors({ ...errors, day: null });
-                }}
-                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                  errors.day ? "border-red-500" : "border-gray-300"
-                }`}
-              >
-                <option value="">Chọn thứ</option>
-                <option value="Thứ 2">Thứ 2</option>
-                <option value="Thứ 3">Thứ 3</option>
-                <option value="Thứ 4">Thứ 4</option>
-                <option value="Thứ 5">Thứ 5</option>
-                <option value="Thứ 6">Thứ 6</option>
-                <option value="Thứ 7">Thứ 7</option>
-                <option value="Chủ nhật">Chủ nhật</option>
-              </select>
-              {errors.day && (
-                <p className="text-red-500 text-xs mt-1">{errors.day}</p>
-              )}
-            </div>
-
-            {/* Specific Date */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Ngày cụ thể (tùy chọn)
+                Chọn ngày *
               </label>
               <input
                 type="date"
                 value={formData.date}
-                onChange={(e) => {
-                  setFormData({ ...formData, date: e.target.value });
-                  if (e.target.value) setErrors({ ...errors, day: null });
-                }}
-                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                placeholder="dd/mm/yyyy"
+                onChange={handleDateChange}
+                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.date ? "border-red-500" : "border-gray-300"
+                  }`}
+              />
+              {errors.date && (
+                <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+              )}
+            </div>
+
+            {/* Day of week (auto-filled) */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Thứ trong tuần
+              </label>
+              <input
+                type="text"
+                value={formData.day}
+                readOnly
+                placeholder="----------------------------------------"
+                className="w-full p-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
               />
             </div>
 
@@ -160,9 +165,8 @@ const ScheduleModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                   setFormData({ ...formData, startTime: e.target.value });
                   if (e.target.value) setErrors({ ...errors, startTime: null });
                 }}
-                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                  errors.startTime ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.startTime ? "border-red-500" : "border-gray-300"
+                  }`}
               />
               {errors.startTime && (
                 <p className="text-red-500 text-xs mt-1">{errors.startTime}</p>
@@ -181,9 +185,8 @@ const ScheduleModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                   setFormData({ ...formData, endTime: e.target.value });
                   if (e.target.value) setErrors({ ...errors, endTime: null });
                 }}
-                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                  errors.endTime ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.endTime ? "border-red-500" : "border-gray-300"
+                  }`}
               />
               {errors.endTime && (
                 <p className="text-red-500 text-xs mt-1">{errors.endTime}</p>
@@ -239,9 +242,8 @@ const ScheduleModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                   if (e.target.value) setErrors({ ...errors, link: null });
                 }}
                 placeholder="https://meet.google.com/abc-defg-hij"
-                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                  errors.link ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.link ? "border-red-500" : "border-gray-300"
+                  }`}
               />
             ) : (
               <input
@@ -252,9 +254,8 @@ const ScheduleModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                   if (e.target.value) setErrors({ ...errors, location: null });
                 }}
                 placeholder="Nhập địa điểm học (VD: Phòng H1-101, CS1)"
-                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                  errors.location ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.location ? "border-red-500" : "border-gray-300"
+                  }`}
               />
             )}
             {errors.link && formData.type === "online" && (
@@ -357,17 +358,17 @@ const ManageSchedulePage = () => {
         schedules.map((s) =>
           s.id === editingSchedule.id
             ? {
-                ...s,
-                day: formData.day,
-                startTime: formData.startTime,
-                endTime: formData.endTime,
-                type: formData.type,
-                link: formData.link,
-                location: formData.location,
-                isRecurring: formData.isRecurring,
-                capacity: formData.classType === "group" ? "Nhóm" : "1-1",
-                max: formData.classType === "group" ? 5 : 1,
-              }
+              ...s,
+              day: formData.day,
+              startTime: formData.startTime,
+              endTime: formData.endTime,
+              type: formData.type,
+              link: formData.link,
+              location: formData.location,
+              isRecurring: formData.isRecurring,
+              capacity: formData.classType === "group" ? "Nhóm" : "1-1",
+              max: formData.classType === "group" ? 5 : 1,
+            }
             : s
         )
       );
