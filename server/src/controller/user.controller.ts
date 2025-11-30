@@ -167,3 +167,80 @@ export const postProgram = async (req: AuthRequest, res: Response): Promise<void
     })
   }
 }
+
+export const updateUserInfor = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.userId
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: 'Không Có User Hợp Lệ'
+      })
+      return
+    }
+
+    const user = await User.findById(userId)
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy người dùng'
+      })
+      return
+    }
+
+    const { phone, avatarUrl, tutor, student } = req.body
+
+    // Cập nhật các trường chung được phép
+    if (phone !== undefined) user.phone = phone
+    if (avatarUrl !== undefined) user.avatarUrl = avatarUrl
+
+    // Cập nhật thông tin student - chỉ cho phép chỉnh year
+    if (student !== undefined && user.roles.includes(UserRole.STUDENT)) {
+      user.student = {
+        faculty: user.student?.faculty ?? 'Unknown',
+        class: user.student?.class ?? 'Unknown',
+        year: student.year ?? user.student?.year ?? 1,
+        gpa: user.student?.gpa ?? 0
+      }
+    }
+
+    // Cập nhật thông tin tutor
+    if (tutor !== undefined && user.roles.includes(UserRole.TUTOR)) {
+      user.tutor = {
+        title: tutor.title ?? user.tutor?.title ?? 'Tutor',
+        department: tutor.department ?? user.tutor?.department ?? 'General',
+        bio: tutor.bio ?? user.tutor?.bio ?? ''
+      }
+    }
+
+    await user.save()
+
+    res.status(200).json({
+      success: true,
+      message: 'Cập nhật thông tin thành công',
+      data: {
+        user: {
+          _id: user._id,
+          displayName: user.displayName,
+          email: user.email,
+          roles: user.roles,
+          status: user.status,
+          phone: user.phone,
+          dateOfBirth: user.dateOfBirth,
+          sex: user.sex,
+          avatarUrl: user.avatarUrl,
+          student: user.student,
+          tutor: user.tutor,
+          updatedAt: user.updatedAt
+        }
+      }
+    })
+  } catch (error) {
+    console.error('UpdateUserInfor error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+}

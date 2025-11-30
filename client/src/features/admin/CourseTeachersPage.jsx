@@ -1,55 +1,97 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { adminService } from "../../service/admin.service";
 
 export default function CourseTeachersPage() {
   const { id: semesterId, courseId } = useParams();
   const navigate = useNavigate();
 
-  // mock course + teachers data
-  const course = {
-    id: courseId,
-    code: courseId,
-    name: "Cấu Trúc Dữ Liệu & Giải Thuật",
-    desc: "Học về các cấu trúc dữ liệu cơ bản và thuật toán",
-    semester: `HK1 2024-2025`,
-    tutors: 2,
-    students: 45,
+  const [course, setCourse] = useState(null);
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [availableTutors, setAvailableTutors] = useState([]);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  // Fetch course (subject) info và danh sách tutors từ API
+  const fetchCourseData = async () => {
+    try {
+      setLoading(true);
+      const response = await adminService.getSubjectById(courseId);
+      if (response.success) {
+        const subjectData = response.data;
+        setCourse({
+          id: subjectData._id,
+          code: subjectData.code,
+          name: subjectData.name,
+          desc: subjectData.description || "Chưa có mô tả",
+          semester: subjectData.semesterId?.name || "Đang tải...",
+          department: subjectData.department,
+          faculty: subjectData.faculty,
+          credits: subjectData.credits,
+          tutors: subjectData.tutorIds?.length || 0,
+          students: 0,
+        });
+
+        // Set teachers từ tutorIds đã được populate
+        if (subjectData.tutorIds && subjectData.tutorIds.length > 0) {
+          const tutorsList = subjectData.tutorIds.map((tutor) => ({
+            id: tutor._id,
+            name: tutor.displayName || tutor.fullName,
+            email: tutor.email,
+            dept: subjectData.department || "Khoa học Máy tính",
+            students: 0,
+          }));
+          setTeachers(tutorsList);
+          console.log("Tutors List:", tutorsList);
+        } else {
+          setTeachers([]);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch course data", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const [teachers, setTeachers] = useState([
-    {
-      id: "t1",
-      name: "TS. Nguyễn Văn An",
-      email: "nguyen.vanan@hcmut.edu.vn",
-      dept: "Khoa học Máy tính",
-      students: 25,
-    },
-    {
-      id: "t2",
-      name: "PGS.TS. Trần Thị Bình",
-      email: "tran.thibinh@hcmut.edu.vn",
-      dept: "Khoa học Máy tính",
-      students: 20,
-    },
-  ]);
+  // Fetch danh sách tất cả users có role TUTOR
+  const fetchAvailableTutors = async () => {
+    try {
+      const response = await adminService.getAllUsers();
+      if (response.success) {
+        // Lọc ra những user có role TUTOR và chưa được gán cho môn học này
+        const tutors = response.data.filter(
+          (user) =>
+            user.roles?.includes("TUTOR") &&
+            !teachers.some((t) => t.id === user._id)
+        );
+        setAvailableTutors(
+          tutors.map((tutor) => ({
+            id: tutor._id,
+            name: tutor.displayName,
+            email: tutor.email,
+            dept: tutor.tutor?.department || "Khoa học Máy tính",
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to fetch available tutors", error);
+    }
+  };
 
-  // add-teacher modal state and mock available teachers
+  useEffect(() => {
+    fetchCourseData();
+  }, [courseId]);
+
+  useEffect(() => {
+    if (!loading) {
+      fetchAvailableTutors();
+    }
+  }, [loading, teachers]);
+
+  // add-teacher modal state
   const [showAdd, setShowAdd] = useState(false);
   const [selected, setSelected] = useState("");
-  const available = [
-    {
-      id: "t3",
-      name: "ThS. Lê Văn Cường",
-      email: "le.vancuong@hcmut.edu.vn",
-      dept: "Khoa học Máy tính",
-    },
-    {
-      id: "t4",
-      name: "TS. Phạm Thị Dung",
-      email: "pham.thidung@hcmut.edu.vn",
-      dept: "Khoa học Máy tính",
-    },
-  ];
 
   const openAdd = () => {
     setSelected("");
@@ -57,25 +99,69 @@ export default function CourseTeachersPage() {
   };
   const closeAdd = () => setShowAdd(false);
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
-    const sel = available.find((a) => a.id === selected);
-    if (!sel) return;
-    setTeachers((prev) => [
-      ...prev,
-      {
-        id: sel.id,
-        name: sel.name,
-        email: sel.email,
-        dept: sel.dept,
-        students: 0,
-      },
-    ]);
-    setShowAdd(false);
+    if (!selected) return;
+
+    try {
+      setActionLoading(true);
+      const response = await adminService.assignTutorToSubject(courseId, selected);
+      if (response.success) {
+        // Refresh data sau khi thêm thành công
+        await fetchCourseData();
+        setShowAdd(false);
+      } else {
+        alert(response.message || "Không thể thêm giảng viên");
+      }
+    } catch (error) {
+      console.error("Failed to add tutor", error);
+      alert(error.response?.data?.message || "Lỗi khi thêm giảng viên");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const removeTeacher = (tid) =>
-    setTeachers((prev) => prev.filter((t) => t.id !== tid));
+  const removeTeacher = async (tutorId) => {
+    if (!confirm("Bạn có chắc muốn xóa giảng viên này khỏi môn học?")) return;
+
+    try {
+      setActionLoading(true);
+      const response = await adminService.removeTutorFromSubject(courseId, tutorId);
+      if (response.success) {
+        // Refresh data sau khi xóa thành công
+        await fetchCourseData();
+      } else {
+        alert(response.message || "Không thể xóa giảng viên");
+      }
+    } catch (error) {
+      console.error("Failed to remove tutor", error);
+      alert(error.response?.data?.message || "Lỗi khi xóa giảng viên");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="text-gray-500">Đang tải...</div>
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="p-6">
+        <button
+          onClick={() => navigate(`/admin/semester/${semesterId}/courses`)}
+          className="px-3 py-2 border rounded mb-4"
+        >
+          ← Quay lại
+        </button>
+        <div className="text-red-500">Không tìm thấy môn học</div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -99,7 +185,7 @@ export default function CourseTeachersPage() {
           </div>
           <div className="text-gray-600 mt-2">{course.desc}</div>
           <div className="text-sm text-gray-500 mt-1">
-            Kỳ: {course.semester}
+            Kỳ: {course.semester} • {course.credits} tín chỉ • {course.department}
           </div>
         </div>
 
@@ -148,23 +234,24 @@ export default function CourseTeachersPage() {
             >
               <div className="flex items-center">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white font-bold mr-4">
-                  {t.name.charAt(0)}
+                  {(t.name || "?").charAt(0)}
                 </div>
                 <div>
-                  <div className="font-medium">{t.name}</div>
-                  <div className="text-sm text-gray-500">{t.email}</div>
-                  <div className="text-sm text-gray-500 mt-1">{t.dept}</div>
+                  <div className="font-medium">{t.name || "Chưa có tên"}</div>
+                  <div className="text-sm text-gray-500">{t.email || "Chưa có email"}</div>
+                  <div className="text-sm text-gray-500 mt-1">{t.dept || ""}</div>
                   <div className="text-sm text-gray-500 mt-1">
-                    👥 {t.students} sinh viên đang hướng dẫn
+                    👥 {t.students || 0} sinh viên đang hướng dẫn
                   </div>
                 </div>
               </div>
               <div>
                 <button
                   onClick={() => removeTeacher(t.id)}
-                  className="px-3 py-2 border rounded text-red-600"
+                  className="px-3 py-2 border rounded text-red-600 disabled:opacity-50"
+                  disabled={actionLoading}
                 >
-                  Xóa
+                  {actionLoading ? "...Đang xử lý" : "Xóa"}
                 </button>
               </div>
             </div>
@@ -177,8 +264,9 @@ export default function CourseTeachersPage() {
         onSubmit={handleAdd}
         selected={selected}
         setSelected={setSelected}
-        available={available}
+        available={availableTutors}
         course={course}
+        loading={actionLoading}
       />
     </>
   );
@@ -193,6 +281,7 @@ function AddTeacherModal({
   setSelected,
   available,
   course,
+  loading,
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   if (!show) return null;
@@ -248,18 +337,24 @@ function AddTeacherModal({
             </button>
             {dropdownOpen && (
               <div className="absolute left-0 right-0 mt-1 bg-white border rounded shadow max-h-48 overflow-auto z-20">
-                {available.map((a) => (
-                  <div
-                    key={a.id}
-                    onClick={() => handleSelect(a.id)}
-                    className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  >
-                    <div className="font-medium">{a.name}</div>
-                    <div className="text-sm text-gray-500">
-                      {a.dept} • {a.email}
-                    </div>
+                {available.length === 0 ? (
+                  <div className="px-3 py-2 text-gray-500 text-center">
+                    Không có giảng viên khả dụng
                   </div>
-                ))}
+                ) : (
+                  available.map((a) => (
+                    <div
+                      key={a.id}
+                      onClick={() => handleSelect(a.id)}
+                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      <div className="font-medium">{a.name}</div>
+                      <div className="text-sm text-gray-500">
+                        {a.dept} • {a.email}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             )}
           </div>
@@ -270,15 +365,17 @@ function AddTeacherModal({
             type="button"
             onClick={closeAll}
             className="px-4 py-2 border rounded"
+            disabled={loading}
           >
             Hủy
           </button>
           <button
             type="submit"
             onClick={() => setDropdownOpen(false)}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
+            className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+            disabled={loading || !selected}
           >
-            Thêm giảng viên
+            {loading ? "Đang thêm..." : "Thêm giảng viên"}
           </button>
         </div>
       </form>

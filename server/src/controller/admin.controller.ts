@@ -1,6 +1,6 @@
 import { Response } from 'express'
 import { AuthRequest } from '@/middlewares/auth.middleware'
-import { Semester, User, Subject, SemesterStatus } from '@/models'
+import { Semester, User, Subject, SemesterStatus, UserRole } from '@/models'
 
 export const getAllSubject = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -19,7 +19,7 @@ export const getAllSubject = async (req: AuthRequest, res: Response): Promise<vo
     // Lấy tất cả subjects của semester này và populate thông tin semester
     const subjects = await Subject.find({ semesterId })
       .populate('semesterId', 'code name academicYear semesterNumber startDate endDate status')
-      .populate('tutorIds', 'email fullName role')
+      .populate('tutorIds', 'email displayName role')
       .sort({ code: 1 })
 
     res.status(200).json({
@@ -301,6 +301,201 @@ export const getAllSemester = async (req: AuthRequest, res: Response): Promise<v
       success: false,
       message: 'Internal server error',
       error: error instanceof Error ? error.message : 'Can not Get All Semester'
+    })
+  }
+}
+
+export const getSemesterInfor = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const semesterId = req.params.id
+    const semester = await Semester.findById(semesterId)
+    if (!semester) {
+      res.status(404).json({
+        success: false,
+        message: 'Semester not found'
+      })
+
+      return
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Semester retrieved successfully',
+      data: semester
+    })
+
+  }
+
+  catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Can not Get Semester Infor'
+    })
+
+  }
+
+}
+
+export const getSubjectInfor = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const subjectId = req.params.id
+
+    const subject = await Subject.findById(subjectId)
+      .populate('semesterId', 'code name academicYear semesterNumber startDate endDate status')
+      .populate('tutorIds', 'email displayName role')
+
+    if (!subject) {
+      res.status(404).json({
+        success: false,
+        message: 'Subject not found'
+      })
+      return
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Subject retrieved successfully',
+      data: subject
+    })
+
+  } catch (error) {
+    console.error('GetSubjectInfor error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Can not Get Subject Infor'
+    })
+  }
+}
+
+export const assignTutorToSubject = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const subjectId = req.params.id
+    const { tutorId } = req.body
+
+    // Validate input
+    if (!tutorId) {
+      res.status(400).json({
+        success: false,
+        message: 'Tutor ID is required'
+      })
+      return
+    }
+
+    // Kiểm tra subject có tồn tại không
+    const subject = await Subject.findById(subjectId)
+    if (!subject) {
+      res.status(404).json({
+        success: false,
+        message: 'Subject not found'
+      })
+      return
+    }
+
+    // Kiểm tra user có tồn tại và có role là TUTOR không
+    const tutor = await User.findById(tutorId)
+    if (!tutor) {
+      res.status(404).json({
+        success: false,
+        message: 'Tutor not found'
+      })
+      return
+    }
+
+    if (!tutor.roles.includes(UserRole.TUTOR)) {
+      res.status(400).json({
+        success: false,
+        message: 'User is not a tutor'
+      })
+      return
+    }
+
+    if (subject.tutorIds.includes(tutorId)) {
+      res.status(400).json({
+        success: false,
+        message: 'Giảng viên đã được gán cho môn học này'
+      })
+      return
+    }
+
+    subject.tutorIds.push(tutorId)
+    await subject.save()
+
+    const updatedSubject = await Subject.findById(subjectId)
+      .populate('semesterId', 'code name academicYear semesterNumber')
+      .populate('tutorIds', 'email displayName role')
+
+    res.status(200).json({
+      success: true,
+      message: 'Thêm giảng viên thành công',
+      data: updatedSubject
+    })
+
+  } catch (error) {
+    console.error('AssignTutorToSubject error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Can not assign tutor to subject'
+    })
+  }
+}
+
+export const removeTutorFromSubject = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const subjectId = req.params.id
+    const { tutorId } = req.body
+
+    // Validate input
+    if (!tutorId) {
+      res.status(400).json({
+        success: false,
+        message: 'Tutor ID is required'
+      })
+      return
+    }
+
+    // Kiểm tra subject có tồn tại không
+    const subject = await Subject.findById(subjectId)
+    if (!subject) {
+      res.status(404).json({
+        success: false,
+        message: 'Subject not found'
+      })
+      return
+    }
+
+    // Kiểm tra tutor có trong danh sách không
+    const tutorIndex = subject.tutorIds.findIndex(id => id.toString() === tutorId)
+    if (tutorIndex === -1) {
+      res.status(400).json({
+        success: false,
+        message: 'Giảng viên không có trong môn học này'
+      })
+      return
+    }
+
+    // Xóa tutor khỏi danh sách
+    subject.tutorIds.splice(tutorIndex, 1)
+    await subject.save()
+
+    // Populate lại thông tin để trả về
+    const updatedSubject = await Subject.findById(subjectId)
+      .populate('semesterId', 'code name academicYear semesterNumber')
+      .populate('tutorIds', 'email displayName role')
+
+    res.status(200).json({
+      success: true,
+      message: 'Xóa giảng viên thành công',
+      data: updatedSubject
+    })
+
+  } catch (error) {
+    console.error('RemoveTutorFromSubject error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Can not remove tutor from subject'
     })
   }
 }

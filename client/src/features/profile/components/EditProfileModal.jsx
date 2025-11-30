@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { authService } from '../../../service/auth.service';
 
 const EditProfileModal = ({ isOpen, onClose, profile, userType }) => {
   const [formData, setFormData] = useState({
@@ -47,18 +48,48 @@ const EditProfileModal = ({ isOpen, onClose, profile, userType }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // TODO: Call API để update profile
-    setTimeout(() => {
+    try {
+      // Chuẩn bị data theo role
+      const updateData = {
+        phone: formData.phone,
+        avatarUrl: formData.avatarUrl,
+      };
+
+      // Thêm data cho student - chỉ có year
+      if (userType === 'student') {
+        updateData.student = {
+          year: parseInt(formData.year) || 1,
+        };
+      }
+
+      // Thêm data cho tutor
+      if (userType === 'tutor') {
+        updateData.tutor = {
+          title: formData.title,
+          department: formData.department,
+          bio: formData.bio,
+        };
+      }
+
+      const response = await authService.updateUserInfor(updateData);
+
+      if (response.success) {
+        alert('Cập nhật thông tin thành công!');
+        onClose();
+        window.location.reload();
+      } else {
+        alert(response.message || 'Cập nhật thất bại');
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      alert(error.response?.data?.message || 'Lỗi khi cập nhật thông tin');
+    } finally {
       setLoading(false);
-      onClose();
-      alert('Cập nhật thông tin thành công!');
-      // Reload page để fetch lại data mới
-      window.location.reload();
-    }, 1000);
+    }
   };
 
   if (!isOpen) return null;
@@ -217,10 +248,10 @@ const EditProfileModal = ({ isOpen, onClose, profile, userType }) => {
                   type="text"
                   name="faculty"
                   value={formData.faculty}
-                  onChange={handleChange}
-                  placeholder={profile?.student?.faculty || 'VD: Computer Science and Engineering'}
-                  className="input-field"
+                  disabled
+                  className="input-field bg-gray-100 cursor-not-allowed"
                 />
+                <p className="text-xs text-gray-500 mt-1">Không thể chỉnh sửa</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -232,10 +263,10 @@ const EditProfileModal = ({ isOpen, onClose, profile, userType }) => {
                     type="text"
                     name="class"
                     value={formData.class}
-                    onChange={handleChange}
-                    placeholder={profile?.student?.class || 'VD: MT2022'}
-                    className="input-field"
+                    disabled
+                    className="input-field bg-gray-100 cursor-not-allowed"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Không thể chỉnh sửa</p>
                 </div>
 
                 <div>
@@ -263,13 +294,10 @@ const EditProfileModal = ({ isOpen, onClose, profile, userType }) => {
                   type="number"
                   name="gpa"
                   value={formData.gpa}
-                  onChange={handleChange}
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  placeholder={profile?.student?.gpa?.toString() || 'VD: 8.5'}
-                  className="input-field"
+                  disabled
+                  className="input-field bg-gray-100 cursor-not-allowed"
                 />
+                <p className="text-xs text-gray-500 mt-1">Không thể chỉnh sửa</p>
               </div>
             </>
           )}
