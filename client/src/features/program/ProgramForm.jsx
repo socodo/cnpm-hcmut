@@ -45,7 +45,6 @@ export default function ProgramForm() {
       });
       setErrors(fieldErrors);
 
-      // focus first invalid field
       const first = Object.keys(fieldErrors)[0];
       document.querySelector(`[name="${first}"]`)?.focus();
       return;
@@ -55,9 +54,7 @@ export default function ProgramForm() {
 
     try {
       setSubmitting(true);
-      // TODO: call API here
-      console.log("Submitting program:", data);
-      alert("Gửi đăng ký thành công (demo)");
+
     } finally {
       setSubmitting(false);
     }
@@ -75,9 +72,8 @@ export default function ProgramForm() {
           name="subject"
           value={data.subject}
           onChange={handleChange}
-          className={`${styles.select} ${
-            errors.subject ? styles.inputInvalid : ""
-          }`}
+          className={`${styles.select} ${errors.subject ? styles.inputInvalid : ""
+            }`}
           required
         >
           <option value="" disabled hidden>
@@ -98,9 +94,8 @@ export default function ProgramForm() {
           <textarea
             name="problem"
             placeholder='VD: "Em gặp khó khăn trong lập trình đệ quy và cấu trúc cây."'
-            className={`${styles.textarea} ${
-              errors.problem ? styles.inputInvalid : ""
-            }`}
+            className={`${styles.textarea} ${errors.problem ? styles.inputInvalid : ""
+              }`}
             value={data.problem}
             onChange={(e) => {
               if (e.target.value.length <= maxChars) handleChange(e);
@@ -130,9 +125,8 @@ export default function ProgramForm() {
             name="format"
             value={data.format}
             onChange={handleChange}
-            className={`${styles.select} ${
-              errors.format ? styles.inputInvalid : ""
-            }`}
+            className={`${styles.select} ${errors.format ? styles.inputInvalid : ""
+              }`}
             required
           >
             <option value="" disabled hidden>
@@ -153,9 +147,8 @@ export default function ProgramForm() {
             name="mentoringType"
             value={data.mentoringType}
             onChange={handleChange}
-            className={`${styles.select} ${
-              errors.mentoringType ? styles.inputInvalid : ""
-            }`}
+            className={`${styles.select} ${errors.mentoringType ? styles.inputInvalid : ""
+              }`}
             required
           >
             <option value="" disabled hidden>
@@ -177,9 +170,8 @@ export default function ProgramForm() {
           <textarea
             name="reason"
             placeholder="VD: Em muốn cải thiện điểm cuối kỳ hoặc học sâu hơn phần thuật toán."
-            className={`${styles.textarea} ${
-              errors.reason ? styles.inputInvalid : ""
-            }`}
+            className={`${styles.textarea} ${errors.reason ? styles.inputInvalid : ""
+              }`}
             value={data.reason}
             onChange={(e) => {
               if (e.target.value.length <= maxChars) handleChange(e);

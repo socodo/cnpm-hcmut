@@ -1,10 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
 export enum SemesterStatus {
-  UPCOMING = 'UPCOMING',
-  OPEN_REGISTRATION = 'OPEN_REGISTRATION',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED'
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
 }
 
 export interface ISemester extends Document {
@@ -14,11 +12,11 @@ export interface ISemester extends Document {
   semesterNumber: number
   startDate: Date
   endDate: Date
-  registrationStartDate: Date
-  registrationEndDate: Date
   status: SemesterStatus
   createdAt: Date
   updatedAt: Date
+  startDateSurvey: Date
+  endDateSurvey: Date
 }
 
 const SemesterSchema = new Schema<ISemester>(
@@ -53,18 +51,19 @@ const SemesterSchema = new Schema<ISemester>(
       type: Date,
       required: true
     },
-    registrationStartDate: {
-      type: Date,
-      required: true
-    },
-    registrationEndDate: {
-      type: Date,
-      required: true
-    },
     status: {
       type: String,
       enum: Object.values(SemesterStatus),
-      default: SemesterStatus.UPCOMING
+      default: SemesterStatus.COMPLETED
+    },
+    startDateSurvey: {
+      type: Date,
+      required: true
+    },
+
+    endDateSurvey: {
+      type: Date,
+      required: true
     }
   },
   {

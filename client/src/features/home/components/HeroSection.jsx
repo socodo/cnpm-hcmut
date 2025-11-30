@@ -1,4 +1,5 @@
-import heroImage from '../../../assets/img/unnamed.jpg'
+import heroImage from "../../../assets/img/unnamed.jpg";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -8,7 +9,7 @@ const HeroSection = () => {
         <div className="flex-1 text-center lg:text-left space-y-6">
           {/* Heading */}
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-            Kết Nối Sinh Viên Và Giảng Viên Để{' '}
+            Kết Nối Sinh Viên Và Giảng Viên Để{" "}
             <span className="text-sky-500 bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">
               Học Tập Tốt Hơn
             </span>
@@ -16,19 +17,25 @@ const HeroSection = () => {
 
           {/* Description */}
           <p className="text-sm md:text-lg text-gray-600 leading-relaxed max-w-2xl">
-            Nền tảng kết nối sinh viên với giáo viên của trường Đại Học Bách Khoa TPHCM,
-            giúp sinh viên giải đáp những vấn đề của mình một cách nhanh chóng tiện lợi
-            với các giáo sư hàng đầu.
+            Nền tảng kết nối sinh viên với giáo viên của trường Đại Học Bách
+            Khoa TPHCM, giúp sinh viên giải đáp những vấn đề của mình một cách
+            nhanh chóng tiện lợi với các giáo sư hàng đầu.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <button className="btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
+            <Link
+              to="/explore"
+              className="btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all flex items-center justify-center"
+            >
               Theo dõi ngay
-            </button>
-            <button className="btn-outline text-lg px-8 py-3 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+            </Link>
+            <Link
+              to="/programs"
+              className="btn-outline text-lg px-8 py-3 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center"
+            >
               Tìm hiểu thêm
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -44,7 +51,7 @@ const HeroSection = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default HeroSection
+export default HeroSection;

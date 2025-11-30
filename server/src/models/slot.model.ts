@@ -57,10 +57,13 @@ const SlotSchema = new Schema<ISlot>(
     },
     location: {
       type: {
-        type: { type: String, required: true },
-        room: { type: String, required: true }
+        type: String,
+        required: true
       },
-      required: true
+      room: {
+        type: String,
+        required: true
+      }
     },
     capacity: {
       type: Number,

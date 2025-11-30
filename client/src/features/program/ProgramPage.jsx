@@ -1,14 +1,22 @@
-import React from 'react'
-import ProgramForm from './ProgramForm'
-import styles from './styles.module.css'
+import React, { useEffect } from "react";
+import ProgramForm from "./ProgramForm";
+import styles from "./styles.module.css";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function ProgramPage() {
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <h1>Đăng ký chương trình Mentoring – HKI 2025–2026</h1>
         <p className={styles.subtitle}>
-          Thông tin sinh viên được đồng bộ từ hệ thống SSO. Vui lòng điền nhu cầu và vấn đề bạn muốn được mentor hỗ trợ.
+          Thông tin sinh viên được đồng bộ từ hệ thống SSO. Vui lòng điền nhu
+          cầu và vấn đề bạn muốn được mentor hỗ trợ.
         </p>
         <div className={styles.notice}>
           <span>🗓️</span>
@@ -22,18 +30,51 @@ export default function ProgramPage() {
         <div className={styles.card}>
           <h2>Thông tin sinh viên</h2>
           <div className={styles.grid}>
-            <input placeholder="Họ và tên" className={styles.input} readOnly value="Nguyễn Văn An" />
-            <input placeholder="Mã số sinh viên (MSSV)" className={styles.input} readOnly value="2152001" />
-            <input placeholder="Email" className={styles.input} readOnly value="an.nguyen@hcmut.edu.vn" />
-            <input placeholder="Khoa/Ngành" className={styles.input} readOnly value="Khoa Khoa học và Kỹ thuật Máy tính" />
-            <input placeholder="Năm học" className={styles.input} readOnly value="Năm 3" />
-            <input placeholder="GPA" className={styles.input} readOnly value="3.20 / 4.00" />
+            <input
+              placeholder="Họ và tên"
+              className={styles.input}
+              readOnly
+              value={user?.displayName}
+            />
+            <input
+              placeholder="Mã số sinh viên (MSSV)"
+              className={styles.input}
+              readOnly
+              value={
+                user.dateOfBirth
+                  ? new Date(user.dateOfBirth).toLocaleDateString("vi-VN")
+                  : ""
+              }
+            />
+            <input
+              placeholder="Email"
+              className={styles.input}
+              readOnly
+              value={user?.email}
+            />
+            <input
+              placeholder="Khoa/Ngành"
+              className={styles.input}
+              readOnly
+              value={user?.student?.faculty}
+            />
+            <input
+              placeholder="Năm học"
+              className={styles.input}
+              readOnly
+              value={`Sinh viên Năm: ${user?.student?.year}`}
+            />
+            <input
+              placeholder="GPA"
+              className={styles.input}
+              readOnly
+              value={`GPA: ${user?.student?.gpa}/10`}
+            />
           </div>
         </div>
 
         <ProgramForm />
-
       </main>
     </div>
-  )
+  );
 }

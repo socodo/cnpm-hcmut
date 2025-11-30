@@ -20,6 +20,11 @@ export const authService = {
   logout: async () => {
     const response = await axios.post('/auth/logout')
     return response
+  },
+
+  updateUserInfor: async (data) => {
+    const response = await axios.patch('/users/update-user-infor', data)
+    return response
   }
 }
 

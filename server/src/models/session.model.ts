@@ -35,11 +35,9 @@ const SessionSchema = new mongoose.Schema(
 SessionSchema.index({ refreshToken: 1 }, { unique: true })
 SessionSchema.index({ userId: 1 })
 
-// TTL Index: Tự động xóa document sau khi expiresAt
-// MongoDB sẽ check mỗi 60 giây và xóa documents đã hết hạn
+
 SessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 })
 
-// Compound index for performance
 SessionSchema.index({ userId: 1, isActive: 1 })
 
 export const Session = mongoose.model<ISession>('Session', SessionSchema)

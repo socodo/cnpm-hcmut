@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose'
+import { Semester } from './semester.model'
 
 export enum PreferredMode {
   ONLINE = 'ONLINE',
@@ -25,8 +26,8 @@ export interface IMentoringRequest extends Document {
   sessionType: SessionType
   reason?: string
   learningGoals?: string
-  startDate: Date
-  endDate: Date
+  startDate?: Date
+  endDate?: Date
   status: MentoringRequestStatus
   createdAt: Date
   updatedAt: Date
@@ -72,12 +73,10 @@ const MentoringRequestSchema = new Schema<IMentoringRequest>(
       trim: true
     },
     startDate: {
-      type: Date,
-      required: true
+      type: Date
     },
     endDate: {
-      type: Date,
-      required: true
+      type: Date
     },
     status: {
       type: String,
@@ -95,5 +94,17 @@ const MentoringRequestSchema = new Schema<IMentoringRequest>(
 MentoringRequestSchema.index({ studentId: 1, status: 1 })
 MentoringRequestSchema.index({ semesterId: 1 })
 MentoringRequestSchema.index({ status: 1, createdAt: -1 })
+
+MentoringRequestSchema.pre('save', async function (next) {
+  if (this.isNew || this.isModified('semesterId')) {
+    const semester = await Semester.findById(this.semesterId)
+
+    if (semester) {
+      this.startDate = semester.startDateSurvey
+      this.endDate = semester.endDateSurvey
+    }
+  }
+  next()
+})
 
 export const MentoringRequest = mongoose.model<IMentoringRequest>('MentoringRequest', MentoringRequestSchema)
