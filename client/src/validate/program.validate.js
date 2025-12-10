@@ -7,8 +7,8 @@ export const programSchema = z.object({
     .trim()
     .min(1, "Vui lòng mô tả vấn đề cụ thể bạn cần mentor.")
     .max(500, "Tối đa 500 ký tự."),
-  format: z.string().min(1, "Vui lòng chọn hình thức mong muốn."),
-  mentoringType: z.string().min(1, "Vui lòng chọn kiểu mentoring."),
+  preferredMode: z.string().min(1, "Vui lòng chọn hình thức mong muốn."),
+  sessionType: z.string().min(1, "Vui lòng chọn kiểu mentoring."),
   reason: z
     .string()
     .trim()

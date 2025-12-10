@@ -26,7 +26,7 @@ const SubjectCard = ({ subject, onClick }) => {
           className="text-lg font-bold text-gray-900 mb-2 line-clamp-1"
           title={subject.name}
         >
-          {subject.name}
+          {subject.code} - {subject.name}
         </h3>
 
         {/* Description */}

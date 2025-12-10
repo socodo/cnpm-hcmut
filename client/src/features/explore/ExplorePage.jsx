@@ -11,8 +11,6 @@ const ExplorePage = () => {
   const [semester, setSemester] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFaculty, setSelectedFaculty] = useState("Tất cả khoa");
-  const [selectedFormat, setSelectedFormat] = useState("Tất cả");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -64,10 +62,8 @@ const ExplorePage = () => {
 
   const filteredSubjects = subjects.filter(
     (subject) =>
-      subject.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedFaculty === "Tất cả khoa" ||
-        subject.department === selectedFaculty) &&
-      (selectedFormat === "Tất cả" || subject.format === selectedFormat)
+      subject.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      subject.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -114,45 +110,6 @@ const ExplorePage = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-          </div>
-
-          {/* Filters */}
-          <div className="flex gap-4">
-            <div className="relative min-w-[200px]">
-              <select
-                className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
-                value={selectedFaculty}
-                onChange={(e) => setSelectedFaculty(e.target.value)}
-              >
-                <option>Tất cả khoa</option>
-                <option>Khoa Khoa học & Kỹ thuật Máy tính</option>
-                <option>Khoa Cơ khí</option>
-                <option>Khoa Điện - Điện tử</option>
-                <option>Khoa Xây dựng</option>
-                <option>Khoa Khoa học Ứng dụng</option>
-              </select>
-              <ChevronDown
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                size={16}
-              />
-            </div>
-
-            <div className="relative min-w-[150px]">
-              <select
-                className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
-                value={selectedFormat}
-                onChange={(e) => setSelectedFormat(e.target.value)}
-              >
-                <option>Tất cả</option>
-                <option>Trực tuyến</option>
-                <option>Trực tiếp</option>
-                <option>Kết hợp</option>
-              </select>
-              <ChevronDown
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                size={16}
-              />
-            </div>
           </div>
         </div>
       </div>

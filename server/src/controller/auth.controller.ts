@@ -4,6 +4,7 @@ import crypto from 'crypto'
 import { Request, Response } from 'express'
 import { User, UserRole } from '@/models/user.model'
 import { Session } from '@/models/session.model'
+import { sendAccountCredentials } from '@/services/email.service'
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'access-secret-key'
 const REFRESH_TOKEN_EXPIRES_DAYS = 7
@@ -94,7 +95,26 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
       sameSite: 'lax'
     })
 
-    // 8. Return response
+    // 8. Send email with credentials
+    try {
+      // Chỉ gửi email nếu đã cấu hình EMAIL_USER và EMAIL_PASSWORD
+      if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+        await sendAccountCredentials(
+          email,
+          displayName,
+          email,
+          password // Gửi mật khẩu gốc (chưa hash)
+        )
+        console.log(`✅ Credentials email sent to ${email}`)
+      } else {
+        console.log('⚠️ Email not configured. Skipping credential email.')
+      }
+    } catch (emailError) {
+      console.error('❌ Failed to send credentials email:', emailError)
+      // Không throw error, vẫn tạo user thành công
+    }
+
+    // 9. Return response
     res.status(201).json({
       success: true,
       message: 'User registered successfully',

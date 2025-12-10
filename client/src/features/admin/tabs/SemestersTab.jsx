@@ -9,6 +9,7 @@ export default function SemestersTab({
   handleInputChange,
   handleSubmit,
   toggleSemesterStatus,
+  handleDeleteSemester,
 }) {
   const navigate = useNavigate();
 
@@ -36,29 +37,8 @@ export default function SemestersTab({
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-100 p-6 shadow-sm flex items-center">
-            <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center mr-4 text-xl">
-              📚
-            </div>
-            <div>
-              <div className="text-2xl font-semibold">
-                {semesters.reduce((acc, s) => acc + (s.subjects || 0), 0)}
-              </div>
-              <div className="text-sm text-gray-600">Tổng môn học</div>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-lg border border-gray-100 p-6 shadow-sm flex items-center">
-            <div className="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center mr-4 text-xl">
-              👥
-            </div>
-            <div>
-              <div className="text-2xl font-semibold">
-                {semesters.reduce((acc, s) => acc + (s.students || 0), 0)}
-              </div>
-              <div className="text-sm text-gray-600">Tổng sinh viên</div>
-            </div>
-          </div>
+
         </div>
       </div>
 
@@ -76,61 +56,74 @@ export default function SemestersTab({
 
       {/* stacked semester cards */}
       <div className="space-y-4">
-        {semesters.map((s) => (
-          <div
-            key={s.id}
-            className="bg-white rounded-lg border border-gray-100 p-6 shadow-sm flex items-center justify-between"
-          >
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-xl font-bold text-gray-900">{s.name}</h3>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${s.statusColor}`}>
-                    {s.status}
-                  </span>
-                </div>
-                <div className="text-sm text-gray-500 font-medium mb-4">{s.code}</div>
+        {semesters
+          .sort((a, b) => {
+            // Sort by status: "Đang mở" first, then others
+            if (a.status === "Đang mở" && b.status !== "Đang mở") return -1;
+            if (a.status !== "Đang mở" && b.status === "Đang mở") return 1;
+            return 0;
+          })
+          .map((s) => (
+            <div
+              key={s.id}
+              className="bg-white rounded-lg border border-gray-100 p-6 shadow-sm flex items-center justify-between"
+            >
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-bold text-gray-900">{s.name}</h3>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${s.statusColor}`}>
+                      {s.status}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-500 font-medium mb-4">{s.code}</div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-6 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400">📅</span>
-                    <span>Bắt đầu: <span className="font-medium text-gray-900">{s.startDate}</span></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400">📅</span>
-                    <span>Kết thúc: <span className="font-medium text-gray-900">{s.endDate}</span></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400">📚</span>
-                    <span><span className="font-medium text-gray-900">{s.subjects}</span> môn học</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400">👥</span>
-                    <span><span className="font-medium text-gray-900">{s.students}</span> sinh viên</span>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-6 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">📅</span>
+                      <span>Bắt đầu: <span className="font-medium text-gray-900">{s.startDate}</span></span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">📅</span>
+                      <span>Kết thúc: <span className="font-medium text-gray-900">{s.endDate}</span></span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">📚</span>
+                      <span><span className="font-medium text-gray-900">{s.subjects}</span> môn học</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">👥</span>
+                      <span><span className="font-medium text-gray-900">{s.students}</span> sinh viên</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex flex-row md:flex-col gap-3 mt-4 md:mt-0 md:ml-6 w-full md:w-auto">
-                <button
-                  onClick={() => navigateToSemesterCourses(s.id)}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2"
-                >
-                  Quản lý môn học <span>→</span>
-                </button>
-                <button
-                  onClick={() => toggleSemesterStatus(s.id)}
-                  className={`px-4 py-2 border text-sm font-medium rounded-lg transition-colors shadow-sm flex items-center justify-center ${s.status === "Đang mở"
-                    ? "border-red-200 text-red-600 hover:bg-red-50"
-                    : "border-green-200 text-green-600 hover:bg-green-50"
-                    }`}
-                >
-                  {s.status === "Đang mở" ? "Đóng kỳ học" : "Mở kỳ học"}
-                </button>
+                <div className="flex flex-row md:flex-col gap-3 mt-4 md:mt-0 md:ml-6 w-full md:w-auto">
+                  <button
+                    onClick={() => navigateToSemesterCourses(s.id)}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2"
+                  >
+                    Quản lý môn học <span>→</span>
+                  </button>
+                  <button
+                    onClick={() => toggleSemesterStatus(s.id)}
+                    className={`px-4 py-2 border text-sm font-medium rounded-lg transition-colors shadow-sm flex items-center justify-center ${s.status === "Đang mở"
+                      ? "border-red-200 text-red-600 hover:bg-red-50"
+                      : "border-green-200 text-green-600 hover:bg-green-50"
+                      }`}
+                  >
+                    {s.status === "Đang mở" ? "Đóng kỳ học" : "Mở kỳ học"}
+                  </button>
+                  <button
+                    onClick={() => handleDeleteSemester(s.id)}
+                    className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 text-sm font-medium rounded-lg transition-colors shadow-sm flex items-center justify-center"
+                  >
+                    Xóa
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* Create modal */}

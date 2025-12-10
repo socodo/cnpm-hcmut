@@ -1,5 +1,7 @@
 import express from 'express'
 import { signUp, signIn, refreshAccessToken, logout } from '@/controller/auth.controller'
+import { authenticate, authorize } from '@/middlewares/auth.middleware'
+import { UserRole } from '@/models'
 
 
 const router = express.Router()
@@ -9,7 +11,7 @@ const router = express.Router()
  * @desc    Register new user
  * @access  Public
  */
-router.post('/signup', signUp)
+router.post('/signup', authenticate, authorize(UserRole.ADMIN), signUp)
 
 /**
  * @route   POST /api/auth/signin

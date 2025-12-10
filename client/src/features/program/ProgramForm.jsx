@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./styles.module.css";
 import { validateProgram, validateField } from "@/validate/program.validate";
+import { adminService } from "@/service/admin.service";
+import { userService } from "@/service/user.service";
+import { toast } from "react-toastify";
 
-export default function ProgramForm() {
+export default function ProgramForm({ semester }) {
   const [data, setData] = useState({
     subject: "",
     problem: "",
-    format: "",
-    mentoringType: "",
+    preferredMode: "",
+    sessionType: "",
     reason: "",
     personalGoal: "",
     adminNote: "",
@@ -54,7 +57,32 @@ export default function ProgramForm() {
 
     try {
       setSubmitting(true);
+      const payload = {
+        semesterId: semester._id,
+        problem: data.subject,
+        problemDetail: data.problem,
+        preferredMode: data.preferredMode,
+        sessionType: data.sessionType,
+        reason: data.reason,
+        learningGoals: data.personalGoal,
+      };
 
+      const res = await userService.postProgram(payload);
+      if (res.data && res.success) {
+        toast.success("Đăng ký thành công!");
+        setData({
+          subject: "",
+          problem: "",
+          preferredMode: "",
+          sessionType: "",
+          reason: "",
+          personalGoal: "",
+          adminNote: "",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Có lỗi xảy ra");
     } finally {
       setSubmitting(false);
     }
@@ -68,21 +96,16 @@ export default function ProgramForm() {
 
       <label className={styles.block}>
         <div className={styles.label}>* Môn học cần hỗ trợ</div>
-        <select
+        <input
+          type="text"
           name="subject"
           value={data.subject}
           onChange={handleChange}
-          className={`${styles.select} ${errors.subject ? styles.inputInvalid : ""
+          className={`${styles.input} ${errors.subject ? styles.inputInvalid : ""
             }`}
+          placeholder="Nhập tên môn học"
           required
-        >
-          <option value="" disabled hidden>
-            Chọn môn học bạn cần hỗ trợ
-          </option>
-          <option>Cấu trúc dữ liệu</option>
-          <option>Thuật toán</option>
-          <option>Hệ điều hành</option>
-        </select>
+        />
         {errors.subject && (
           <div className={styles.fieldError}>{errors.subject}</div>
         )}
@@ -122,44 +145,42 @@ export default function ProgramForm() {
         <label style={{ flex: 1 }}>
           <div className={styles.label}>* Hình thức mong muốn</div>
           <select
-            name="format"
-            value={data.format}
+            name="preferredMode"
+            value={data.preferredMode}
             onChange={handleChange}
-            className={`${styles.select} ${errors.format ? styles.inputInvalid : ""
+            className={`${styles.select} ${errors.preferredMode ? styles.inputInvalid : ""
               }`}
             required
           >
             <option value="" disabled hidden>
               Chọn hình thức
             </option>
-            <option>1:1</option>
-            <option>Nhóm</option>
-            <option>Trực tuyến</option>
+            <option value="ONLINE">Online</option>
+            <option value="OFFLINE">Offline</option>
           </select>
-          {errors.format && (
-            <div className={styles.fieldError}>{errors.format}</div>
+          {errors.preferredMode && (
+            <div className={styles.fieldError}>{errors.preferredMode}</div>
           )}
         </label>
 
         <label style={{ flex: 1 }}>
           <div className={styles.label}>* Kiểu mentoring</div>
           <select
-            name="mentoringType"
-            value={data.mentoringType}
+            name="sessionType"
+            value={data.sessionType}
             onChange={handleChange}
-            className={`${styles.select} ${errors.mentoringType ? styles.inputInvalid : ""
+            className={`${styles.select} ${errors.sessionType ? styles.inputInvalid : ""
               }`}
             required
           >
             <option value="" disabled hidden>
               Chọn kiểu mentoring
             </option>
-            <option value="Academic">Academic</option>
-            <option value="Career">Career</option>
-            <option value="Project">Project</option>
+            <option value="ONE_ON_ONE">1-1</option>
+            <option value="GROUP">Nhóm</option>
           </select>
-          {errors.mentoringType && (
-            <div className={styles.fieldError}>{errors.mentoringType}</div>
+          {errors.sessionType && (
+            <div className={styles.fieldError}>{errors.sessionType}</div>
           )}
         </label>
       </div>
@@ -201,7 +222,7 @@ export default function ProgramForm() {
           <input
             name="personalGoal"
             className={styles.input}
-            placeholder="VD: Đạt điểm A trong môn Cấu trúc dữ liệu"
+            placeholder="VD: Đạt điểm A môn DSA"
             value={data.personalGoal}
             onChange={handleChange}
           />

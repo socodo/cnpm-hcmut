@@ -98,6 +98,20 @@ export default function SemesterCoursesPage() {
     }
   };
 
+  const handleDelete = async (subjectId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa môn học này không?")) return;
+    try {
+      const response = await adminService.deleteSubject(subjectId);
+      if (response.success) {
+        toast.success("Xóa môn học thành công");
+        fetchSemesterAndCourses();
+      }
+    } catch (error) {
+      console.error("Failed to delete subject", error);
+      toast.error(error.message || "Không thể xóa môn học");
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center">
@@ -227,7 +241,10 @@ export default function SemesterCoursesPage() {
                         Quản lý GV →
                       </button>
                       <button className="px-3 py-2 border rounded">✏️</button>
-                      <button className="px-3 py-2 border rounded text-red-600">
+                      <button
+                        onClick={() => handleDelete(c.id)}
+                        className="px-3 py-2 border rounded text-red-600"
+                      >
                         🗑️
                       </button>
                     </div>

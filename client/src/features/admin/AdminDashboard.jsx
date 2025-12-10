@@ -94,18 +94,33 @@ export default function AdminDashboard() {
     const semester = semesters.find(s => s.id === id);
     if (!semester) return;
 
-    const newStatus = semester.status === "Đang mở" ? "COMPLETED" : "ACTIVE";
+    const isClosing = semester.status === "Đang mở";
+    const newStatus = isClosing ? "COMPLETED" : "ACTIVE";
 
     try {
       const response = await adminService.updateSemesterStatus(id, newStatus);
       if (response.success) {
-        const successMessage = response.message
-        toast.success(successMessage);
+        const message = isClosing ? "Đóng kỳ học thành công!" : "Mở kỳ học thành công!";
+        toast.success(message);
         fetchSemesters();
       }
     } catch (error) {
-      const errorMessage = error.message
-      toast.error(errorMessage);
+      console.error("Failed to update semester status", error);
+      toast.error(error.response?.data?.message || "Không thể cập nhật trạng thái kỳ học");
+    }
+  };
+
+  const handleDeleteSemester = async (id) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa kỳ học này không? Tất cả môn học liên quan sẽ bị xóa.")) return;
+    try {
+      const response = await adminService.deleteSemester(id);
+      if (response.success) {
+        toast.success("Xóa kỳ học thành công!");
+        fetchSemesters();
+      }
+    } catch (error) {
+      console.error("Failed to delete semester", error);
+      toast.error(error.response?.data?.message || "Không thể xóa kỳ học");
     }
   };
 
@@ -169,6 +184,7 @@ export default function AdminDashboard() {
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
           toggleSemesterStatus={toggleSemesterStatus}
+          handleDeleteSemester={handleDeleteSemester}
         />
       )}
 

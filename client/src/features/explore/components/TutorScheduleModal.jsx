@@ -10,7 +10,9 @@ import {
   Users,
   AlertCircle,
 } from "lucide-react";
-import { getMockTutorSchedule } from "../data/mockdata";
+import { adminService } from "../../../service/admin.service";
+import { userService } from "../../../service/user.service";
+import { toast } from "react-toastify";
 
 const TutorScheduleModal = ({ isOpen, onClose, tutor, subject }) => {
   const [schedule, setSchedule] = useState([]);
@@ -18,12 +20,44 @@ const TutorScheduleModal = ({ isOpen, onClose, tutor, subject }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isOpen && tutor) {
-      const tutorSchedule = getMockTutorSchedule(tutor.id);
-      setSchedule(tutorSchedule);
-      setSelectedSlots([]);
-    }
-  }, [isOpen, tutor]);
+    const fetchSlots = async () => {
+      if (isOpen && tutor && subject) {
+        setLoading(true);
+        try {
+          const tutorId = tutor.id || tutor._id;
+          const subjectId = subject.id || subject._id;
+
+          if (!tutorId || !subjectId) {
+            console.error("Missing tutorId or subjectId", { tutor, subject });
+            setLoading(false);
+            return;
+          }
+
+          const response = await adminService.getTutorSlotsBySubject(tutorId, subjectId);
+          if (response.success) {
+            const mappedSlots = response.data.map(slot => ({
+              id: slot._id,
+              available: true,
+              dayName: `${slot.dayOfWeek}, ${new Date(slot.date).toLocaleDateString('vi-VN')}`,
+              time: `${slot.startTime} - ${slot.endTime}`,
+              format: slot.location.type === 'online' ? 'Online' : 'Offline',
+              type: slot.capacity === 1 ? '1-1' : 'Nhóm',
+              members: slot.capacity > 1 ? `${slot.bookedCount}/${slot.capacity}` : null,
+              location: slot.location.room
+            }));
+            setSchedule(mappedSlots);
+          }
+        } catch (error) {
+          console.error("Failed to fetch slots", error);
+        } finally {
+          setLoading(false);
+        }
+        setSelectedSlots([]);
+      }
+    };
+
+    fetchSlots();
+  }, [isOpen, tutor, subject]);
 
   const handleSlotClick = (slot) => {
     if (!slot.available) return;
@@ -41,22 +75,33 @@ const TutorScheduleModal = ({ isOpen, onClose, tutor, subject }) => {
     return selectedSlots.includes(slot.id);
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (selectedSlots.length === 0) {
-      alert("Vui lòng chọn ít nhất 1 khung giờ!");
+      toast.error("Vui lòng chọn ít nhất 1 khung giờ!");
       return;
     }
 
     setLoading(true);
 
-    // Giả lập API call
-    setTimeout(() => {
-      setLoading(false);
-      alert(
+    try {
+      // Call API for each selected slot
+      // Note: Ideally backend should support bulk booking, but for now we loop
+      const promises = selectedSlots.map(slotId =>
+        userService.bookSlot({ slotId })
+      );
+
+      await Promise.all(promises);
+
+      toast.success(
         `Đăng ký thành công!\n\nGia sư: ${tutor.name}\nMôn: ${subject.name}\nSố buổi đã chọn: ${selectedSlots.length}\n\nGia sư sẽ liên hệ với bạn sớm!`
       );
       onClose();
-    }, 1500);
+    } catch (error) {
+      console.error("Booking failed", error);
+      toast.error(error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen || !tutor) return null;
@@ -121,11 +166,10 @@ const TutorScheduleModal = ({ isOpen, onClose, tutor, subject }) => {
                   <div
                     key={slot.id}
                     onClick={() => handleSlotClick(slot)}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      isSelected
-                        ? "border-sky-500 bg-sky-50"
-                        : "border-gray-200 hover:border-sky-200 hover:bg-gray-50"
-                    }`}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${isSelected
+                      ? "border-sky-500 bg-sky-50"
+                      : "border-gray-200 hover:border-sky-200 hover:bg-gray-50"
+                      }`}
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <Calendar size={18} className="text-gray-500" />
@@ -139,11 +183,10 @@ const TutorScheduleModal = ({ isOpen, onClose, tutor, subject }) => {
 
                     <div className="flex flex-wrap gap-2">
                       <span
-                        className={`flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${
-                          slot.format === "Online"
-                            ? "bg-blue-50 text-blue-600 border-blue-100"
-                            : "bg-green-50 text-green-600 border-green-100"
-                        }`}
+                        className={`flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${slot.format === "Online"
+                          ? "bg-blue-50 text-blue-600 border-blue-100"
+                          : "bg-green-50 text-green-600 border-green-100"
+                          }`}
                       >
                         {slot.format === "Online" ? (
                           <Video size={14} className="mr-1" />
@@ -154,11 +197,10 @@ const TutorScheduleModal = ({ isOpen, onClose, tutor, subject }) => {
                       </span>
 
                       <span
-                        className={`flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${
-                          slot.type === "1-1"
-                            ? "bg-purple-50 text-purple-600 border-purple-100"
-                            : "bg-orange-50 text-orange-600 border-orange-100"
-                        }`}
+                        className={`flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${slot.type === "1-1"
+                          ? "bg-purple-50 text-purple-600 border-purple-100"
+                          : "bg-orange-50 text-orange-600 border-orange-100"
+                          }`}
                       >
                         {slot.type === "1-1" ? (
                           <User size={14} className="mr-1" />

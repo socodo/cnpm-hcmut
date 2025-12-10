@@ -1,6 +1,6 @@
 import { Response } from 'express'
 import { AuthRequest } from '@/middlewares/auth.middleware'
-import { Semester, User, Subject, SemesterStatus, UserRole } from '@/models'
+import { Semester, User, Subject, SemesterStatus, UserRole, Slot, MentoringRequest } from '@/models'
 
 export const getAllSubject = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -77,6 +77,105 @@ export const createSubject = async (req: AuthRequest, res: Response): Promise<vo
   }
   catch (error) {
     console.error('CreateSubject error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+}
+
+export const deleteSubject = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const subjectId = req.params.id
+
+    const subject = await Subject.findById(subjectId)
+    if (!subject) {
+      res.status(404).json({
+        success: false,
+        message: 'Subject not found'
+      })
+      return
+    }
+
+    await Subject.findByIdAndDelete(subjectId)
+
+    res.status(200).json({
+      success: true,
+      message: 'Subject deleted successfully'
+    })
+  } catch (error) {
+    console.error('DeleteSubject error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+}
+
+export const deleteSemester = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const semesterId = req.params.id
+
+    const semester = await Semester.findById(semesterId)
+    if (!semester) {
+      res.status(404).json({
+        success: false,
+        message: 'Semester not found'
+      })
+      return
+    }
+
+    // Delete all subjects associated with this semester
+    await Subject.deleteMany({ semesterId })
+
+    // Delete the semester
+    await Semester.findByIdAndDelete(semesterId)
+
+    res.status(200).json({
+      success: true,
+      message: 'Semester deleted successfully'
+    })
+  } catch (error) {
+    console.error('DeleteSemester error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+}
+
+export const getActiveSemesterRequests = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    // Find active semester
+    const activeSemester = await Semester.findOne({ status: SemesterStatus.ACTIVE })
+    if (!activeSemester) {
+      res.status(404).json({
+        success: false,
+        message: 'No active semester found'
+      })
+      return
+    }
+
+    // Get all mentoring requests for active semester
+    const requests = await MentoringRequest.find({ semesterId: activeSemester._id })
+      .populate('studentId', 'email displayName student')
+      .populate('semesterId', 'code name')
+      .sort({ createdAt: -1 })
+
+    res.status(200).json({
+      success: true,
+      message: 'Mentoring requests retrieved successfully',
+      data: {
+        semester: activeSemester,
+        requests: requests,
+        total: requests.length
+      }
+    })
+  } catch (error) {
+    console.error('GetActiveSemesterRequests error:', error)
     res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -301,6 +400,31 @@ export const getAllSemester = async (req: AuthRequest, res: Response): Promise<v
       success: false,
       message: 'Internal server error',
       error: error instanceof Error ? error.message : 'Can not Get All Semester'
+    })
+  }
+}
+
+export const getActiveSemester = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const semester = await Semester.findOne({ status: SemesterStatus.ACTIVE })
+    if (!semester) {
+      res.status(404).json({
+        success: false,
+        message: 'No active semester found'
+      })
+      return
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Active semester retrieved successfully',
+      data: semester
+    })
+  } catch (error) {
+    console.error('GetActiveSemester error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Can not Get Active Semester'
     })
   }
 }
@@ -550,6 +674,65 @@ export const getTutorsBySubject = async (req: AuthRequest, res: Response): Promi
       success: false,
       message: 'Internal server error',
       error: error instanceof Error ? error.message : 'Can not get tutors by subject'
+    })
+  }
+}
+
+export const getTutorSlotsBySubject = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { tutorId, subjectId } = req.query
+
+    if (!tutorId || !subjectId) {
+      res.status(400).json({
+        success: false,
+        message: 'Missing required fields: tutorId and subjectId'
+      })
+      return
+    }
+
+    // Lấy semester đang active
+    const activeSemester = await Semester.findOne({ status: SemesterStatus.ACTIVE })
+    if (!activeSemester) {
+      res.status(200).json({
+        success: true,
+        message: 'No active semester found',
+        data: []
+      })
+      return
+    }
+
+    const currentDate = new Date()
+    currentDate.setHours(0, 0, 0, 0)
+
+    const slots = await Slot.find({
+      tutorId,
+      subjectId,
+      semesterId: activeSemester._id,
+      status: 'AVAILABLE',
+      date: { $gte: currentDate }
+    })
+      .sort({ date: 1, startTime: 1 })
+      .populate('tutorId', 'displayName email avatar')
+      .populate('subjectId', 'name code')
+
+    const days = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']
+    const slotsWithDay = slots.map((slot) => ({
+      ...slot.toObject(),
+      dayOfWeek: days[new Date(slot.date).getDay()]
+    }))
+
+    res.status(200).json({
+      success: true,
+      message: 'Slots retrieved successfully',
+      data: slotsWithDay
+    })
+
+  } catch (error) {
+    console.error('GetTutorSlotsBySubject error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error'
     })
   }
 }

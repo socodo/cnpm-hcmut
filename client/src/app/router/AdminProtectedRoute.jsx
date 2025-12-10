@@ -10,7 +10,6 @@ const AdminProtectedRoute = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        console.log('Admin Route Check:', { isAuthenticated, user: user?.displayName, roles: user?.roles, accessToken: !!accessToken })
 
         // Nếu đã authenticated nhưng chưa có user data, fetch user info
         if (isAuthenticated && !user) {

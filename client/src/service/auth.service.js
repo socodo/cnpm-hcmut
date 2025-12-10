@@ -6,6 +6,11 @@ export const authService = {
     return response
   },
 
+  signup: async (userData) => {
+    const response = await axios.post('/auth/signup', userData)
+    return response
+  },
+
   fetchMe: async () => {
     const response = await axios.get('/users/get-me')
     console.log('fetch me response:', response)
