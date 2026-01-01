@@ -1,199 +1,265 @@
-# 🎓 Tutor Support System - Group 4
+# 🎓 Mentor Bright – Tutor Support System 
 
-> 🚀 **Modern web application for connecting tutors and students**  
+> 🚀 **A modern mentoring platform connecting students and university lecturers**
+> Built with **MERN**
 
+---
+
+## 📌 Overview
+
+**Mentor Bright** is a web-based mentoring support system designed for students at **Ho Chi Minh City University of Technology (HCMUT)**.
+The platform enables students to connect with lecturers and mentors to receive academic guidance, resolve learning difficulties, and participate in structured mentoring programs throughout a semester.
+
+This repository focuses on the **Frontend application**, built using **React** and **Tailwind CSS**.
 
 ---
 
-FE REACT && TAILWINDCSS
+## 🧠 Core Concept
 
----------------------------
-┌─────────────────────────────────────────────────────────┐
-│  GIAI ĐOẠN 1: ĐẦU KỲ (Tháng 7)                        │
-└─────────────────────────────────────────────────────────┘
-1. Admin tạo SEMESTER mới (status: UPCOMING)
-2. Sinh viên điền form khảo sát
-   → Tạo MENTORING_REQUESTS
+The system follows a **semester-based mentoring workflow**, managed by administrators and lecturers:
 
-┌─────────────────────────────────────────────────────────┐
-│  GIAI ĐOẠN 2: CHUẨN BỊ (Tháng 8)                       │
-└─────────────────────────────────────────────────────────┘
-3. Admin xem MENTORING_REQUESTS
-   → Quyết định mở môn nào
-   → Tạo SUBJECTS và gán tutorIds
-4. Cập nhật SEMESTER status: OPEN_REGISTRATION
-5. Sinh viên đăng ký môn
-   → Tạo REGISTRATIONS
-6. Admin duyệt đăng ký
+* Students participate in surveys at the beginning of each semester
+* Administrators analyze demands and open mentoring subjects
+* Lecturers publish their available time slots
+* Students register, book mentoring sessions, and provide feedback
 
-┌─────────────────────────────────────────────────────────┐
-│  GIAI ĐOẠN 3: BẮT ĐẦU HỌC (Tháng 9)                    │
-└─────────────────────────────────────────────────────────┘
-7. Cập nhật SEMESTER status: IN_PROGRESS
-8. Giảng viên tạo lịch rảnh
-   → Tạo SLOTS (với date cụ thể)
-9. Sinh viên xem môn → chọn giảng viên → xem lịch → book
-   → Tạo BOOKINGS
-10. Hệ thống gửi NOTIFICATIONS
-
-┌─────────────────────────────────────────────────────────┐
-│  GIAI ĐOẠN 4: DIỄN RA (Cả kỳ)                          │
-└─────────────────────────────────────────────────────────┘
-11. Check-in khi đến buổi mentor
-12. Hoàn thành và để lại feedback
-13. Giảng viên tiếp tục tạo SLOTS mới
-
-
-
+Mentoring sessions can be conducted **online or offline**.
 
 ---
+
+## 🔄 Mentoring Workflow
+
+### 🟦 Phase 1: Beginning of Semester (July)
+
+1. Admin creates a new **Semester** (`UPCOMING`)
+2. Students complete survey forms
+   → Generate **Mentoring Requests**
+
+---
+
+### 🟨 Phase 2: Preparation (August)
+
+3. Admin reviews mentoring requests
+
+   * Selects subjects to open
+   * Assigns lecturers (tutors)
+4. Semester status updated to `OPEN_REGISTRATION`
+5. Students register for subjects
+   → Create **Registrations**
+6. Admin approves registrations
+
+---
+
+### 🟩 Phase 3: Learning Starts (September)
+
+7. Semester status updated to `IN_PROGRESS`
+8. Lecturers publish available schedules
+   → Create **Slots**
+9. Students browse subjects → select lecturer → book slot
+   → Create **Bookings**
+10. System sends notifications
+
+---
+
+### 🟪 Phase 4: During the Semester
+
+11. Students check in for mentoring sessions
+12. Sessions are completed and rated
+13. Lecturers continue adding new slots
+
+---
+
+## 🧩 Key Features (Frontend)
+
+* Semester & subject exploration
+* Lecturer availability & booking system
+* Online / offline mentoring types
+* Rating & feedback after sessions
+* Responsive UI with Tailwind CSS
+* Clean component-based architecture
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+| Technology       | Usage                      |
+| ---------------- | -------------------------- |
+| **React**        | UI development             |
+| **Vite**         | Fast build tool            |
+| **Tailwind CSS** | Styling                    |
+| **React Router** | Client-side routing        |
+| **Axios**        | HTTP client                |
+| **ESLint**       | Code quality & consistency |
+
+### Backend
+
+| Technology     | Usage                              |
+| -------------- | ---------------------------------- |
+| **Node.js**    | Runtime environment                |
+| **Express.js** | RESTful API server                 |
+| **MongoDB**    | NoSQL database                     |
+| **JWT**        | Authentication & authorization     |
+| **Cloudinary** | Media storage (avatars, materials) |
+
+---
+
 ## 🚀 Quick Start
+
+### 1️⃣ Clone Repository
+
+```bash
+git clone https://github.com/your-org/mentor-bright.git
+cd mentor-bright
 ```
-###  Install & Run Frontend
-```powershell
+
+---
+
+### 2️⃣ Run Backend Server
+
+```bash
+cd server
+npm install
+npm run dev
+```
+
+Backend server runs at:
+👉 `http://localhost:8080`
+
+---
+
+### 3️⃣ Run Frontend Client
+
+```bash
 cd client
 npm install
 npm run dev
 ```
+
+Frontend application runs at:
+👉 `http://localhost:5173`
+
 ---
+
 ## ⚙️ Development Commands
-### Frontend Commands
-```powershell
+
+### Backend Commands
+
+```bash
 # Install dependencies
 npm install
+
 # Run development server
 npm run dev
+```
+
+### Fr
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
 # Build for production
 npm run build
+
 # Preview production build
 npm run preview
-# Check code style 
+
+# Check code style
 npm run lint
 ```
+
 ---
+
 ## 📏 ESLint Rules & Code Standards
-The project uses ESLint with custom rules to maintain code quality and consistency:
-### 🔧 Detailed Rules Explanation
-### 🔹 **React-specific rules**
-| Rule | Level | Description |
-|------|-------|-------------|
-| `react-refresh/only-export-components` | ⚠️ warn | Cảnh báo nếu export không phải component (giúp React Refresh hoạt động đúng) |
-| `react-hooks/rules-of-hooks` | 🚫 error | Bắt buộc dùng hook đúng chỗ (chỉ trong function component, custom hook) |
-| `react-hooks/exhaustive-deps` | ⚠️ warn | Cảnh báo nếu thiếu dependency trong useEffect, useCallback, useMemo |
-| `react/prop-types` | ➖ off | Tắt kiểm tra PropTypes |
-| `react/display-name` | ➖ off | Tắt rule bắt buộc đặt displayName cho component (cho linh hoạt) |
-### 🔹 **Code quality rules**
-| Rule | Level | Description |
-|------|-------|-------------|
-| `no-console` | ⚠️ warn | Cảnh báo khi có console.log |
-| `no-lonely-if` | ⚠️ warn | Cảnh báo khi dùng if lẻ trong else → nên dùng else if |
-| `no-unused-vars` | ⚠️ warn | Cảnh báo biến khai báo mà không dùng |
-| `no-trailing-spaces` | ⚠️ warn | Cảnh báo khoảng trắng ở cuối dòng |
-| `no-multi-spaces` | ⚠️ warn | Cảnh báo dùng nhiều hơn 1 space liên tiếp |
-| `no-multiple-empty-lines` | ⚠️ warn | Cảnh báo có nhiều dòng trống liên tiếp |
-| `no-unexpected-multiline` | ⚠️ warn | Ngăn lỗi do ASI (Automatic Semicolon Insertion) gây ra |
-### 🔹 **Formatting rules**
-| Rule | Level | Description |
-|------|-------|-------------|
-| `space-before-blocks` | 🚫 error | Luôn có 1 space trước dấu `{` |
-| `object-curly-spacing` | ⚠️ warn | Luôn có space bên trong `{ ... }` |
-| `indent` | ⚠️ warn | Thụt dòng 2 spaces |
-| `semi` | ⚠️ warn | Không dùng dấu `;` |
-| `quotes` | 🚫 error | Luôn dùng nháy đơn `'` |
-| `array-bracket-spacing` | ⚠️ warn | Luôn có space trong `[ ... ]` |
-| `linebreak-style` | ➖ off | Không ép buộc kiểu xuống dòng (LF/CRLF) |
-| `keyword-spacing` | ⚠️ warn | Bắt buộc có space quanh từ khóa (`if (...)`, `for (...)`) |
-| `comma-dangle` | ⚠️ warn | Cảnh báo về dấu phẩy cuối (theo mặc định rule ESLint) |
-| `comma-spacing` | ⚠️ warn | Cảnh báo nếu thiếu space sau dấu phẩy |
-| `arrow-spacing` | ⚠️ warn | Cảnh báo thiếu space quanh `=>` |
-### 📋 Key Standards
-#### ✅ **Required:**
-- **Single quotes** for strings
-- **2-space indentation**
-- **No semicolons** (ASI style)
-- **Space before blocks** `if () {`
-- **Proper React hooks usage**
-#### ⚠️ **Warnings:**
-- Console statements (remove in production)
-- Unused variables
-- Multiple empty lines
-- Inconsistent spacing
-#### 🚫 **Errors:**
-- React hooks violations
-- Single quote violations
-- Missing spaces before blocks
-### 🛠️ Usage
-```powershell
-# Check all files
-npm run lint
-# Auto-fix fixable issues
-npm run lint -- --fix
-# Check specific file
-npx eslint src/components/MyComponent.jsx
-```
----
-## 🌿 Git Workflow
-### 🔑 Main Branches
-- **`main`** → Production branch, always stable
-- **`feature/*`** → Feature branches from `main`
-```
-┌─── Git Flow Diagram ───┐
-                        
-  (dev)     ●────●───●───●───●───●─────●─────●─────●───●
-             │    │                    ╱               / 
-             |    │                   ╱               /
-             |    │                  ╱  (merge)      /
- (feature/A) │    ●───●──●────●─────●               /
-             │                ↑                    / (merge) 
-             │                PR                  /
-             │             (review)              /
-             │                                  /  
- (feature/B) ●───●───●───●───●─●───●─●───●─●───●
-                                           ↑
-                                           PR
-                                        (review)
-                         
-### 🛠️ Workflow Steps
-#### 1. Update main branch
+
+This project uses **custom ESLint rules** to ensure clean and consistent code.
+
+### 🔹 React Rules
+
+* Proper usage of React Hooks
+* React Refresh compatibility
+* No PropTypes enforcement (flexibility)
+
+### 🔹 Code Quality
+
+* Warn on `console.log`
+* Prevent unused variables
+* Enforce clean spacing & formatting
+
+### 🔹 Formatting Standards
+
+* **Single quotes**
+* **2-space indentation**
+* **No semicolons**
+* Space before `{`
+* Consistent array & object spacing
+
+### 🛠️ ESLint Usage
+
 ```bash
+# Lint all files
+npm run lint
+
+# Auto-fix issues
+npm run lint -- --fix
+```
+
+---
+
+## 🌿 Git Workflow
+
+### Main Branches
+
+* **`main`** – Stable production branch
+* **`dev`** – Development branch
+* **`feature/*`** – Feature implementation
+
+### Workflow Steps
+
+```bash
+# Update dev
 git checkout dev
 git pull origin dev
-```
-#### 2. Create new feature branch
-```bash
+
+# Create feature branch
 git checkout -b feature/ISSUE-xxx-feature-name
-```
-#### 3. Commit and push code
-```bash
+
+# Commit changes
 git add .
-git commit -m "feat: add login form (#123)"
+git commit -m "feat: add booking UI"
+
+# Push branch
 git push origin feature/ISSUE-xxx-feature-name
 ```
-#### 4. Create Pull Request
-- **Source:** `feature/*`
-- **Target:** `dev`
-- **Requirement:** Review before merge ✅
----
-### 🔧 Handling Conflicts
-When conflicts occur during merge/rebase:
-1) **Ensure you're on the correct branch:**
-```bash
-git checkout feature/ISSUE-xxx-feature-name
-```
-2) **Resolve conflicts** (look for `<<<<<<<`, `=======`, `>>>>>>>`) and stage:
-```bash
-git add -A
-```
-3) **Amend commit and force push:**
-```bash
-git commit --amend --no-edit
-git push origin feature/ISSUE-xxx-feature-name -f
-```
+
+➡️ Create a **Pull Request** to `dev`
+➡️ Review required before merge
+
 ---
 
-### 🚫 Don't:
-- Commit directly to `main`
-- Force push to `main`
-- Merge without PR review
+## 🚫 Rules
 
-FE REACT && TAILWINDCSS
+* ❌ Do not commit directly to `main`
+* ❌ Do not force-push to `main`
+* ❌ No merge without PR review
+
+---
+
+## 🎯 Target Audience
+
+* University students
+* Academic mentors & lecturers
+* Educational program administrators
+
+---
+
+## 📬 Contact
+
+For questions or collaboration:
+
+📧 **[anh.trannguyen@hcmut.edu.vn](mailto:anh.trannguyen@hcmut.edu.vn)**
